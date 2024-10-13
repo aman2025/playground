@@ -1,28 +1,26 @@
 "use client"
 
 import { useState } from "react"
+import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-export default function SignUp() {
-  const [name, setName] = useState("")
+export default function SignIn() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch("/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
       })
-      if (res.ok) {
-        router.push("/signin")
+      if (res?.ok) {
+        router.push("/")
       }
     } catch (error) {
       console.error(error)
@@ -32,14 +30,7 @@ export default function SignUp() {
   return (
     <div className="flex justify-center items-center min-h-screen">
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-center">Sign Up</h1>
-        <Input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <h1 className="text-2xl font-bold text-center">Sign In</h1>
         <Input
           type="email"
           placeholder="Email"
@@ -54,7 +45,7 @@ export default function SignUp() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <Button type="submit" className="w-full">Sign Up</Button>
+        <Button type="submit" className="w-full">Sign In</Button>
       </form>
     </div>
   )
