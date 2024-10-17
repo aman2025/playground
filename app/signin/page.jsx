@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 
 export default function SignIn() {
   const [email, setEmail] = useState("")
@@ -46,6 +47,11 @@ export default function SignIn() {
           required
         />
         <Button type="submit" className="w-full">Sign In</Button>
+        <div className="text-center">
+          <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            Forgot Password?
+          </Link>
+        </div>
       </form>
     </div>
   )
