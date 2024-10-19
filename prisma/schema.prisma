@@ -18,6 +18,8 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  resetToken    String?
+  resetTokenExpires DateTime?
 }
 
 model Account {
