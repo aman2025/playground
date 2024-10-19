@@ -10,10 +10,12 @@ import Link from "next/link"
 export default function SignIn() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("") // State to hold error message
   const router = useRouter()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError("") // Reset error message on new submit attempt
     try {
       const res = await signIn("credentials", {
         email,
@@ -22,9 +24,12 @@ export default function SignIn() {
       })
       if (res?.ok) {
         router.push("/")
+      } else {
+        setError("Sign-in failed. Please check your credentials.") // Set error message on failure
       }
     } catch (error) {
       console.error(error)
+      setError("An unexpected error occurred. Please try again.") // Set error message on exception
     }
   }
 
@@ -47,6 +52,7 @@ export default function SignIn() {
           required
         />
         <Button type="submit" className="w-full">Sign In</Button>
+        {error && <p className="text-red-500 text-center">{error}</p>} {/* Display error message */}
         <div className="text-center">
           <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
             Forgot Password?
