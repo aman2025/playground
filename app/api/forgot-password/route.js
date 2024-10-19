@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server"
 import nodemailer from "nodemailer"
+import crypto from "crypto"
+import { prisma } from "@/lib/prisma"
 
 export async function POST(req) {
   const { email } = await req.json()
 
   // TODO: Validate the email and check if it exists in your database
-  console.log(email)
-  // Create a reset token (you may want to use a library like `crypto` for this)
-  const resetToken = Math.random().toString(36).substr(2, 10)
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 })
+  }
 
-  // TODO: Save the reset token and its expiration time in your database
+  // Create a reset token
+  const resetToken = crypto.randomBytes(20).toString('hex')
+  const resetTokenExpires = new Date(Date.now() + 3600000) // 1 hour from now
+
+  // Save the reset token and its expiration time in the database
+  await prisma.user.update({
+    where: { email },
+    data: { resetToken, resetTokenExpires },
+  })
 
   // Create a nodemailer transporter
   const transporter = nodemailer.createTransport({
