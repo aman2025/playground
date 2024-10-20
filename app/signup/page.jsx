@@ -4,28 +4,35 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 
 export default function SignUp() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
   const router = useRouter()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError("")
     try {
-      const res = await fetch("/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       })
+
+      const data = await res.json()
+
       if (res.ok) {
-        router.push("/signin")
+        router.push(`/verify?email=${encodeURIComponent(email)}`)
+      } else {
+        setError(data.error || "Sign-up failed. Please try again.")
       }
     } catch (error) {
       console.error(error)
+      setError(`An unexpected error occurred: ${error.message}`)
     }
   }
 
@@ -55,6 +62,12 @@ export default function SignUp() {
           required
         />
         <Button type="submit" className="w-full">Sign Up</Button>
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        <div className="text-center">
+          <Link href="/signin" className="text-sm text-blue-600 hover:underline">
+            Already have an account? Sign In
+          </Link>
+        </div>
       </form>
     </div>
   )

@@ -20,6 +20,7 @@ model User {
   sessions      Session[]
   resetToken    String?
   resetTokenExpires DateTime?
+  verificationCode String?
 }
 
 model Account {

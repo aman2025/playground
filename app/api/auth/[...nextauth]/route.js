@@ -25,6 +25,7 @@ const handler = NextAuth({
             email: credentials.email
           }
         })
+        console.log(user)
 
         if (!user || !user.password) {
           return null
