@@ -1,44 +1,40 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
-import { generateVerificationCode } from '@/lib/utils'
 import { sendVerificationEmail } from '@/lib/email'
 
 export async function POST(req) {
-  const { name, email, password } = await req.json()
-
   try {
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    })
+    const { name, email, password } = await req.json()
 
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 })
     }
 
+    // Generate verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString()
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Generate verification code
-    const verificationCode = generateVerificationCode()
-
-    // Create new user
-    const user = await prisma.user.create({
+    // Store user details and verification code in a temporary storage
+    await prisma.tempUser.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        verificationCode,
-      },
+        verificationCode
+      }
     })
 
     // Send verification email
     await sendVerificationEmail(email, verificationCode)
 
-    return NextResponse.json({ message: 'User created successfully', userId: user.id })
+    return NextResponse.json({ message: 'Verification email sent' }, { status: 200 })
   } catch (error) {
-    console.error('Error creating user:', error)
-    return NextResponse.json({ error: `Failed to create user: ${error.message}` }, { status: 500 })
+    console.error('Signup error:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

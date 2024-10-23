@@ -11,12 +11,14 @@ export default function SignUp() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  const [verificationSent, setVerificationSent] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
     try {
+      // First, initiate the signup process
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -26,7 +28,8 @@ export default function SignUp() {
       const data = await res.json()
 
       if (res.ok) {
-        router.push(`/verify?email=${encodeURIComponent(email)}`)
+        setVerificationSent(true)
+        // Instead of redirecting, we'll show a message to check email
       } else {
         setError(data.error || "Sign-up failed. Please try again.")
       }
@@ -36,6 +39,19 @@ export default function SignUp() {
     }
   }
 
+  // Render verification sent message
+  if (verificationSent) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">Verification Email Sent</h2>
+          <p>Please check your email and click the verification link to complete your signup.</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Render signup form
   return (
     <div className="flex justify-center items-center min-h-screen">
       <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
