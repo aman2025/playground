@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
-
+// 弃用这个文件，使用auth/signup
 export async function POST(req) {
   try {
     const { name, email, password } = await req.json()

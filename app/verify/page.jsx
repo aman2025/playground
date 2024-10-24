@@ -7,32 +7,25 @@ import { Input } from "@/components/ui/input"
 
 export default function VerifyEmail() {
   const [verificationCode, setVerificationCode] = useState("")
-  const [email, setEmail] = useState("")
   const [error, setError] = useState("")
+  const [verifySuccess, setVerifySuccess] = useState(false) // State to track verification success
+
   const router = useRouter()
   const searchParams = useSearchParams()
-
-  useEffect(() => {
-    // Get email from URL parameters
-    const emailParam = searchParams.get('email')
-    if (emailParam) {
-      setEmail(decodeURIComponent(emailParam))
-    }
-  }, [searchParams])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
     try {
-      const res = await fetch('/api/auth/verify-code', {
+      const res = await fetch('/api/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, verificationCode }),
+        body: JSON.stringify({ verificationCode }),
       })
 
       if (res.ok) {
-        // Verification successful, redirect to home page or dashboard
-        router.push('/')
+        // Verification successful, set verifySuccess to true
+        setVerifySuccess(true)
       } else {
         setError("Invalid verification code. Please try again.")
       }
@@ -44,19 +37,28 @@ export default function VerifyEmail() {
 
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-center">Verify Your Email</h1>
-        <p className="text-center">Please enter the verification code sent to {email}</p>
-        <Input
-          type="text"
-          placeholder="Verification Code"
-          value={verificationCode}
-          onChange={(e) => setVerificationCode(e.target.value)}
-          required
-        />
-        <Button type="submit" className="w-full">Verify</Button>
-        {error && <p className="text-red-500 text-center">{error}</p>}
-      </form>
+      {verifySuccess ? (
+        // Render success message and link to sign-in page if verification is successful
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Registration Successful!</h1>
+          <p>Your email has been verified successfully.</p>
+          <a href="/signin" className="text-blue-500 underline">Go to Sign In</a>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+          <h1 className="text-2xl font-bold text-center">Verify Your Email</h1>
+          <p className="text-center">Please enter the verification code</p>
+          <Input
+            type="text"
+            placeholder="Verification Code"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            required
+          />
+          <Button type="submit" className="w-full">Verify</Button>
+          {error && <p className="text-red-500 text-center">{error}</p>}
+        </form>
+      )}
     </div>
   )
 }

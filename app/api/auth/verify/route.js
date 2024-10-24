@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 
-export async function GET(req) {
-  const { searchParams } = new URL(req.url)
-  const code = searchParams.get('code')
+export async function POST(req) {
+  const { verificationCode } = await req.json()
 
-  if (!code) {
+  if (!verificationCode) {
     return NextResponse.json({ error: 'Missing verification code' }, { status: 400 })
   }
-
+  
   try {
     // Find the temporary user with this code
-    const tempUser = await prisma.tempUser.findUnique({ where: { verificationCode: code } })
+    const tempUser = await prisma.tempUser.findUnique({ where: { verificationCode } })
 
     if (!tempUser) {
       return NextResponse.json({ error: 'Invalid or expired verification code' }, { status: 400 })
@@ -31,7 +30,7 @@ export async function GET(req) {
     await prisma.tempUser.delete({ where: { id: tempUser.id } })
 
     // Redirect to a success page or login page
-    return NextResponse.redirect('/signup-success')
+    return NextResponse.redirect('/signin')
   } catch (error) {
     console.error('Verification error:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
