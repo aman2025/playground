@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import Layout from "@/components/Layout"
+import Image from "next/image"
 
 export default async function Home() {
   const session = await getServerSession()
@@ -11,16 +11,11 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
-        <h1 className="text-4xl font-bold">Welcome, {session.user?.name || "User"}!</h1>
-        <p className="mt-4">You are signed in as {session.user?.email}</p>
-        <div className="mt-8">
-          <Link href="/api/auth/signout">
-            <Button>Sign Out</Button>
-          </Link>
-        </div>
+    <Layout>
+      <div className="flex flex-col items-center justify-center h-full">
+        <Image src="/logo.png" alt="Playground Logo" width={100} height={100} />
+        <h1 className="text-4xl font-bold mt-4">Playground</h1>
       </div>
-    </main>
+    </Layout>
   )
 }

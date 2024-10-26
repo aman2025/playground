@@ -1,0 +1,64 @@
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+
+// Component for the sidebar history item
+const HistoryItem = ({ title }) => (
+  <div className="px-4 py-2 hover:bg-gray-700 cursor-pointer">
+    {title}
+  </div>
+)
+
+// Main Layout component
+export default function Layout({ children }) {
+  return (
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside className="w-60 bg-gray-900 text-white flex flex-col">
+        {/* Header */}
+        <div className="p-4 flex items-center">
+          <Image src="/logo.png" alt="Playground Logo" width={32} height={32} />
+          <span className="ml-2 text-xl font-semibold">Playground</span>
+        </div>
+
+        {/* Main sidebar content - History */}
+        <div className="flex-grow overflow-y-auto">
+          <HistoryItem title="Role form demo" />
+          <HistoryItem title="Generate table demo" />
+          <HistoryItem title="Who are you?" />
+          {/* Add more history items as needed */}
+        </div>
+
+        {/* Footer - User profile */}
+        <div className="p-4 border-t border-gray-700">
+          <div className="flex items-center">
+            <Image src="/user-avatar.png" alt="User Avatar" width={32} height={32} className="rounded-full" />
+            <span className="ml-2">Username</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main content area */}
+      <main className="flex-grow p-6">
+        <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
+          {/* Content */}
+          <div className="flex-grow overflow-y-auto p-6">
+            {children}
+          </div>
+
+          {/* Chat input */}
+          <div className="border-t border-gray-200 p-4">
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Type your message..."
+                className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Button className="rounded-l-none">Send</Button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}
