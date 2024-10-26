@@ -7,10 +7,19 @@ export async function POST(req) {
   try {
     const { name, email, password } = await req.json()
 
-    // Check if user already exists
+    // Check if user already exists in main users table
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 })
+    }
+
+    // Check if user exists in temporary users table
+    const existingTempUser = await prisma.tempUser.findUnique({ where: { email } })
+    if (existingTempUser) {
+      return NextResponse.json({ 
+        error: 'Verification email already sent. Please check your inbox for the verification code.', 
+        status: 'PENDING_VERIFICATION' 
+      }, { status: 400 })
     }
 
     // Generate verification code
