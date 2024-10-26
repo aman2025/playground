@@ -53,10 +53,18 @@ export default function SignIn() {
         />
         <Button type="submit" className="w-full">Sign In</Button>
         {error && <p className="text-red-500 text-center">{error}</p>} {/* Display error message */}
-        <div className="text-center">
-          <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
-            Forgot Password?
-          </Link>
+        <div className="text-center space-y-2">
+          <div>
+            <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+              Forgot Password?
+            </Link>
+          </div>
+          <div>
+            <span className="text-sm text-gray-500">Don't have an account? </span>
+            <Link href="/signup" className="text-sm text-blue-600 hover:underline">
+              Sign up
+            </Link>
+          </div>
         </div>
       </form>
     </div>
