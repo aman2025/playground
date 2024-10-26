@@ -46,8 +46,8 @@ export default function VerifyEmail() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-          <h1 className="text-2xl font-bold text-center">Verify Your Email</h1>
-          <p className="text-center">Please enter the verification code</p>
+          <h1 className="text-2xl font-bold text-center">Verification Email Sent </h1>
+          <p className="text-center">Please check your email and enter verification code</p>
           <Input
             type="text"
             placeholder="Verification Code"

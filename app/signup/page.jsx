@@ -11,7 +11,6 @@ export default function SignUp() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
-  const [verificationSent, setVerificationSent] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e) => {
@@ -28,7 +27,7 @@ export default function SignUp() {
       const data = await res.json()
 
       if (res.ok) {
-        setVerificationSent(true)
+        router.push("/verify")
         // Instead of redirecting, we'll show a message to check email
       } else {
         setError(data.error || "Sign-up failed. Please try again.")
@@ -38,18 +37,7 @@ export default function SignUp() {
       setError(`An unexpected error occurred: ${error.message}`)
     }
   }
-
-  // Render verification sent message
-  if (verificationSent) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Verification Email Sent</h2>
-          <p>Please check your email and click the verification link to complete your signup.</p>
-        </div>
-      </div>
-    )
-  }
+ 
 
   // Render signup form
   return (

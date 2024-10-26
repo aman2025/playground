@@ -29,8 +29,8 @@ export async function POST(req) {
     // Delete the temporary user
     await prisma.tempUser.delete({ where: { id: tempUser.id } })
 
-    // Redirect to a success page or login page
-    return NextResponse.redirect('/signin')
+    // Return success message
+    return NextResponse.json({ message: 'Signup successful' }, { status: 200 })
   } catch (error) {
     console.error('Verification error:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
