@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -46,31 +48,29 @@ export default function ResetPassword() {
   }
 
   return (
-    <div>
-      <h1>Reset Password</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="flex justify-center items-center min-h-screen">
+      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+        <h1 className="text-2xl font-bold text-center">Reset Password</h1>
         <div>
-          <label htmlFor="password">New Password:</label>
-          <input
+          <Input
             type="password"
-            id="password"
+            placeholder="New Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
         <div>
-          <label htmlFor="confirmPassword">Confirm Password:</label>
-          <input
+          <Input
             type="password"
-            id="confirmPassword"
+            placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
         </div>
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        <button type="submit">Reset Password</button>
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        <Button type="submit" className="w-full">Reset Password</Button>
       </form>
     </div>
   );
