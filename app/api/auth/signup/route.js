@@ -16,6 +16,31 @@ export async function POST(req) {
     // Check if user exists in temporary users table
     const existingTempUser = await prisma.tempUser.findUnique({ where: { email } })
     if (existingTempUser) {
+      // Check if the existing temp user record is older than 1 hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+      
+      if (existingTempUser.createdAt < oneHourAgo) {
+        // Generate new verification code
+        const newVerificationCode = Math.floor(100000 + Math.random() * 900000).toString()
+        
+        // Update the temporary user with new verification code and timestamp
+        await prisma.tempUser.update({
+          where: { email },
+          data: {
+            verificationCode: newVerificationCode,
+            createdAt: new Date()
+          }
+        })
+        
+        // Resend verification email
+        await sendVerificationEmail(email, newVerificationCode)
+        
+        return NextResponse.json({ 
+          message: 'New verification email sent',
+          status: 'VERIFICATION_RESENT' 
+        }, { status: 200 })
+      }
+      
       return NextResponse.json({ 
         error: 'Verification email already sent. Please check your inbox for the verification code.', 
         status: 'PENDING_VERIFICATION' 
