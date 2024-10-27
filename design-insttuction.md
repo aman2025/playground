@@ -24,3 +24,4 @@ Create a modern responsive layout with a fixed sidebar and dynamic content area:
 2. Content Area
    -  Company logo + app name in the center
 	 -  Fixed chat input bar at the bottom
+
