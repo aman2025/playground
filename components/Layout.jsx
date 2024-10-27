@@ -17,7 +17,7 @@ export default function Layout({ children, session }) {
       <aside className="w-60 flex flex-col" style={{ backgroundColor: '#f9fafb' }}>
         {/* Header */}
         <div className="p-4 flex items-center">
-          <Image src="/images/logo.png" alt="Playground Logo" width={32} height={32} />
+          <Image src="/images/logo.png" alt="Playground Logo" width={28} height={28} />
           <span className="ml-2 text-xl font-semibold">Playground</span>
         </div>
 
