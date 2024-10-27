@@ -10,14 +10,14 @@ const HistoryItem = ({ title }) => (
 )
 
 // Main Layout component
-export default function Layout({ children }) {
+export default function Layout({ children, session }) {
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen" style={{ backgroundColor: '#f9fafb' }}>
       {/* Sidebar */}
-      <aside className="w-60 bg-gray-900 text-white flex flex-col">
+      <aside className="w-60 flex flex-col" style={{ backgroundColor: '#f9fafb' }}>
         {/* Header */}
         <div className="p-4 flex items-center">
-          <Image src="/logo.png" alt="Playground Logo" width={32} height={32} />
+          <Image src="/images/logo.png" alt="Playground Logo" width={32} height={32} />
           <span className="ml-2 text-xl font-semibold">Playground</span>
         </div>
 
@@ -30,16 +30,19 @@ export default function Layout({ children }) {
         </div>
 
         {/* Footer - User profile */}
-        <div className="p-4 border-t border-gray-700">
+        <div className="p-4">
           <div className="flex items-center">
-            <Image src="/user-avatar.png" alt="User Avatar" width={32} height={32} className="rounded-full" />
-            <span className="ml-2">Username</span>
+            {/* Light blue background circle with the first character of the user's name */}
+            <div className="flex items-center justify-center w-9 h-9 bg-blue-300 rounded-full text-white font-bold">
+              {session?.user?.name?.charAt(0).toUpperCase() || 'G'}
+            </div>
+            <span className="ml-2">{session?.user?.name || 'Guest'}</span>
           </div>
         </div>
       </aside>
 
       {/* Main content area */}
-      <main className="flex-grow p-6">
+      <main className="flex-grow p-3">
         <div className="bg-white rounded-lg border border-gray-200 h-full flex flex-col">
           {/* Content */}
           <div className="flex-grow overflow-y-auto p-6">
