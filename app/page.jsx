@@ -16,7 +16,7 @@ export default async function Home() {
     <Layout session={session}>
       <div className="flex flex-col items-center justify-center h-full">
         <Image src="/images/logo.png" alt="Playground Logo" width={80} height={80} />
-        <h1 className="text-3xl mt-4">Playground</h1>
+        <h1 className="text-2xl mt-4 text-gray-400">PLAYGROUND</h1>
       </div>
     </Layout>
   )
