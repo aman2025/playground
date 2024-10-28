@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Paperclip, Send } from 'lucide-react'
 
 // Component for the sidebar history item
 const HistoryItem = ({ title }) => (
@@ -52,13 +53,32 @@ export default function Layout({ children, session }) {
 
             {/* Chat input */}
             <div className="p-4">
-              <div className="flex items-center">
+              <div 
+                className="flex items-center border border-gray-300 p-1 pl-3"
+                style={{ borderRadius: '16px' }} // Set border radius to 12px
+              >
+                {/* Attachment icon on the left using Lucide's Paperclip icon */}
+                <Paperclip
+                  size={24} // Set the size of the icon
+                  className="mr-2 cursor-pointer"
+                />
+                {/* Input element in the middle with no border */}
                 <input
                   type="text"
                   placeholder="Type your message..."
-                  className="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-grow px-4 py-2 focus:outline-none border-none"
+                  style={{ fontSize: '16px' }}
                 />
-                <Button className="rounded-l-none">Send</Button>
+                {/* Send button on the right with plane icon using Lucide's Send icon */}
+                <Button 
+                  className="rounded bg-white hover:bg-gray-200 border-none" // Set default and hover background colors
+                  style={{ borderRadius: '8px' }} // Set border radius
+                >
+                  <Send
+                    size={24} // Set the size of the icon
+                    className="text-blue-500"
+                  />
+                </Button>
               </div>
             </div>
           </div>
