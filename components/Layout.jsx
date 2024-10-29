@@ -54,31 +54,41 @@ export default function Layout({ children, session }) {
             {/* Chat input */}
             <div className="p-4">
               <div 
-                className="flex items-center border border-gray-300 p-1 pl-3"
-                style={{ borderRadius: '16px' }} // Set border radius to 12px
+                className="flex flex-row justify-center border border-gray-300 p-1 pl-3"
+                style={{ borderRadius: '16px' }} 
               >
-                {/* Attachment icon on the left using Lucide's Paperclip icon */}
-                <Paperclip
-                  size={24} // Set the size of the icon
-                  className="mr-2 cursor-pointer"
-                />
-                {/* Input element in the middle with no border */}
-                <input
-                  type="text"
-                  placeholder="Type your message..."
-                  className="flex-grow px-4 py-2 focus:outline-none border-none"
-                  style={{ fontSize: '16px' }}
-                />
-                {/* Send button on the right with plane icon using Lucide's Send icon */}
-                <Button 
-                  className="rounded bg-white hover:bg-gray-200 border-none" // Set default and hover background colors
-                  style={{ borderRadius: '8px' }} // Set border radius
-                >
-                  <Send
-                    size={24} // Set the size of the icon
-                    className="text-blue-500"
+                <div className=" min-h-full ">
+                  <Paperclip
+                    size={24} 
+                    className="mt-2"
                   />
-                </Button>
+                </div>
+                <div className="flex flex-1 flex-col">
+                  <input
+                    type="text"
+                    placeholder="Type your message..."
+                    className="flex-grow px-4 py-2 focus:outline-none border-none"
+                    style={{ fontSize: '16px' }}
+                  />
+                  <div className="flex-shrink-1 flex flex-row flex-wrap items-start">
+                    <div className="m-1 h-[5rem] w-[5rem]">
+                      <div class="relative h-full w-full rounded-[6px] border border-gray-200 p-[0.375rem]">
+                      <Image src="/images/logo.png" width={28} height={28} className="h-full max-h-full w-full max-w-full rounded-md object-cover" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex min-h-full items-end">
+                  <Button 
+                    className="rounded bg-white hover:bg-gray-200 border-none" 
+                    style={{ borderRadius: '8px' }} 
+                  >
+                    <Send
+                      size={24}
+                      className="text-blue-500"
+                    />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
