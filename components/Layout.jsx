@@ -2,11 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Paperclip, Send } from 'lucide-react'
-
-// Component for the sidebar history item
-const HistoryItem = ({ title }) => (
-  <div className="cursor-pointer px-4 py-2 hover:bg-gray-700">{title}</div>
-)
+import History from './History'
+import UserProfile from './UserProfile'
 
 // Main Layout component
 export default function Layout({ children, session }) {
@@ -21,23 +18,10 @@ export default function Layout({ children, session }) {
         </div>
 
         {/* Main sidebar content - History */}
-        <div className="flex-grow overflow-y-auto">
-          <HistoryItem title="Role form demo" />
-          <HistoryItem title="Generate table demo" />
-          <HistoryItem title="Who are you?" />
-          {/* Add more history items as needed */}
-        </div>
+        <History />
 
         {/* Footer - User profile */}
-        <div className="p-4">
-          <div className="flex items-center">
-            {/* Light blue background circle with the first character of the user's name */}
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-300 font-bold text-white">
-              {session?.user?.name?.charAt(0).toUpperCase() || 'G'}
-            </div>
-            <span className="ml-2">{session?.user?.name || 'Guest'}</span>
-          </div>
-        </div>
+        <UserProfile session={session} />
       </aside>
 
       {/* Main content area */}
