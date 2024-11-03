@@ -1,12 +1,22 @@
+'use client'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Paperclip, Send } from 'lucide-react'
-import History from './History'
+import ChatHistory from './ChatHistory'
 import UserProfile from './UserProfile'
+import ChatInterface from './ChatInterface'
+import { useState } from 'react'
 
 // Main Layout component
 export default function Layout({ children, session }) {
+  const [currentChatId, setCurrentChatId] = useState(null)
+  const handleNewChat = (chatId) => {
+    setCurrentChatId(chatId)
+    // You might want to use Next.js router to navigate to the new chat
+    window.location.href = `/chat/${chatId}`
+  }
+
   return (
     <div className="flex h-screen" style={{ backgroundColor: '#f9fafb' }}>
       {/* Sidebar */}
@@ -18,61 +28,19 @@ export default function Layout({ children, session }) {
         </div>
 
         {/* Main sidebar content - History */}
-        <History />
+        <ChatHistory currentChatId={currentChatId} onNewChat={handleNewChat} />
 
         {/* Footer - User profile */}
         <UserProfile session={session} />
       </aside>
 
       {/* Main content area */}
-      <main className="flex-grow p-3">
-        <div className="flex h-full justify-center rounded-lg border border-gray-200 bg-white">
-          <div className="flex flex-col" style={{ width: '75%' }}>
-            {/* Content */}
-            <div className="flex-grow overflow-y-auto p-6">{children}</div>
 
-            {/* Chat input */}
-            <div className="p-4">
-              <div
-                className="flex flex-row justify-center border border-gray-300 p-1 pl-3"
-                style={{ borderRadius: '16px' }}
-              >
-                <div className=" min-h-full ">
-                  <Paperclip size={24} className="mt-2" />
-                </div>
-                <div className="flex flex-1 flex-col">
-                  <input
-                    type="text"
-                    placeholder="Type your message..."
-                    className="flex-grow border-none px-4 py-2 focus:outline-none"
-                    style={{ fontSize: '16px' }}
-                  />
-                  <div className="flex-shrink-1 flex flex-row flex-wrap items-start">
-                    <div className="m-1 h-[5rem] w-[5rem]">
-                      <div class="relative h-full w-full rounded-[6px] border border-gray-200 p-[0.375rem]">
-                        <Image
-                          src="/images/logo.png"
-                          width={28}
-                          height={28}
-                          className="h-full max-h-full w-full max-w-full rounded-md object-cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex min-h-full items-end">
-                  <Button
-                    className="rounded border-none bg-white hover:bg-gray-200"
-                    style={{ borderRadius: '8px' }}
-                  >
-                    <Send size={24} className="text-blue-500" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="flex h-full justify-center rounded-lg border border-gray-200 bg-white">
+        <div className="flex flex-col" style={{ width: '75%' }}>
+          <ChatInterface initialChatId={currentChatId} />
         </div>
-      </main>
+      </div>
     </div>
   )
 }
