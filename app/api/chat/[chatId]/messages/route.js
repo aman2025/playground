@@ -3,8 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
-const MISTRAL_API_ENDPOINT = 'https://api.mistral.ai/v1/chat/completions'
-
 export async function POST(request, { params }) {
   try {
     // Get the authenticated user's session
@@ -63,17 +61,17 @@ export async function POST(request, { params }) {
     messages.push({ role: 'user', content })
 
     // Call Mistral API with conversation history
-    const mistralResponse = await fetch(MISTRAL_API_ENDPOINT, {
+    const mistralResponse = await fetch(process.env.MISTRAL_API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'mistral-medium',
+        agent_id: process.env.AGENT_ID,
         messages,
         max_tokens: 1000,
-        temperature: 0.7,
+        stream: false,
       }),
     })
 
@@ -82,8 +80,8 @@ export async function POST(request, { params }) {
     }
 
     const mistralData = await mistralResponse.json()
-    const assistantContent = mistralData.choices[0].message.content
 
+    const assistantContent = mistralData.choices[0].message.content
     // Save assistant message
     const assistantMessage = await prisma.message.create({
       data: {
