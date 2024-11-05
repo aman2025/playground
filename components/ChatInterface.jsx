@@ -9,20 +9,36 @@ export default function ChatInterface({ initialChatId }) {
   const [chatId, setChatId] = useState(initialChatId)
   const fileInputRef = useRef()
 
+  const chatInitializedRef = useRef(false)
+  const messagesLoadedRef = useRef(false)
+
   useEffect(() => {
     const initializeChat = async () => {
-      if (!chatId) {
-        try {
-          const response = await fetch('/api/chats', {
-            method: 'POST',
-          })
-          const newChat = await response.json()
-          setChatId(newChat.id)
-          // Update URL without refreshing the page
-          window.history.pushState({}, '', `/chat/${newChat.id}`)
-        } catch (error) {
-          console.error('Error creating initial chat:', error)
+      if (chatInitializedRef.current || chatId) return
+      chatInitializedRef.current = true
+
+      try {
+        const getResponse = await fetch('/api/chats')
+        const chats = await getResponse.json()
+
+        for (const chat of chats) {
+          console.log('chatid:', chat.id)
+          const messagesResponse = await fetch(`/api/chat/${chat.id}/messages`)
+          const messages = await messagesResponse.json()
+          if (messages.length === 0) {
+            setChatId(chat.id)
+            window.history.pushState({}, '', `/chat/${chat.id}`)
+            return
+          }
         }
+        const response = await fetch('/api/chats', {
+          method: 'POST',
+        })
+        const newChat = await response.json()
+        setChatId(newChat.id)
+        window.history.pushState({}, '', `/chat/${newChat.id}`)
+      } catch (error) {
+        console.error('Error creating initial chat:', error)
       }
     }
 
@@ -31,16 +47,17 @@ export default function ChatInterface({ initialChatId }) {
 
   useEffect(() => {
     const loadMessages = async () => {
-      if (chatId) {
-        try {
-          const response = await fetch(`/api/chat/${chatId}/messages`)
-          if (response.ok) {
-            const data = await response.json()
-            setMessages(data)
-          }
-        } catch (error) {
-          console.error('Error loading messages:', error)
+      if (messagesLoadedRef.current || !chatId) return
+
+      try {
+        const response = await fetch(`/api/chat/${chatId}/messages`)
+        if (response.ok) {
+          const data = await response.json()
+          setMessages(data)
+          messagesLoadedRef.current = true
         }
+      } catch (error) {
+        console.error('Error loading messages:', error)
       }
     }
 
