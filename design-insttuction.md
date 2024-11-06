@@ -8,3 +8,4 @@ add chat feature to the app
 - create necessary prisma schema
 - each chat have multiple messages
 - chat history and message with independent component
+- use tailwind css for styling
