@@ -7,14 +7,14 @@ export default function ChatHistory({ currentChatId, onNewChat }) {
   const [chats, setChats] = useState([])
 
   useEffect(() => {
-    // Fetch chat history with message counts
+    // Only fetch chats on initial load, not when currentChatId changes
     const fetchChats = async () => {
       const response = await fetch('/api/chats?include_message_count=true')
       const data = await response.json()
       setChats(data)
     }
     fetchChats()
-  }, [currentChatId])
+  }, [])
 
   const handleNewChat = async () => {
     try {
