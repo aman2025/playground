@@ -1,10 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 // Component to display chat history in sidebar
 export default function ChatHistory({ currentChatId, onNewChat }) {
   const [chats, setChats] = useState([])
+  const pathname = usePathname()
 
   useEffect(() => {
     // Only fetch chats on initial load, not when currentChatId changes
@@ -44,9 +46,11 @@ export default function ChatHistory({ currentChatId, onNewChat }) {
 
   return (
     <div className="w-64 bg-gray-800 p-4 text-white">
-      <button onClick={handleNewChat} className="mb-4 w-full rounded bg-gray-700 p-2">
-        New Chat
-      </button>
+      {pathname !== '/chat' && (
+        <button onClick={handleNewChat} className="mb-4 w-full rounded bg-gray-700 p-2">
+          New Chat
+        </button>
+      )}
       <div className="space-y-2">
         {chats.map((chat) => (
           <Link
