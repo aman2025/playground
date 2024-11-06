@@ -51,18 +51,20 @@ export async function GET(request) {
   }
 }
 
-export async function POST() {
+export async function POST(request) {
   try {
-    // Get the authenticated user's session
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Get the title from the request body
+    const { title } = await request.json()
+
     // Create new chat for the authenticated user
     const chat = await prisma.chat.create({
       data: {
-        title: 'New Chat',
+        title: title || 'New Chat',
         userId: session.user.id,
       },
     })
