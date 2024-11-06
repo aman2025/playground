@@ -52,6 +52,10 @@ export default function ChatHistory({ currentChatId, onNewChat }) {
           <Link
             key={chat.id}
             href={`/chat/${chat.id}`}
+            onClick={(e) => {
+              e.preventDefault()
+              onNewChat(chat.id)
+            }}
             className={`block rounded p-2 ${
               currentChatId === chat.id ? 'bg-gray-700' : 'hover:bg-gray-700'
             }`}

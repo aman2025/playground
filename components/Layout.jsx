@@ -13,7 +13,7 @@ export default function Layout({ children, session }) {
   const [currentChatId, setCurrentChatId] = useState(null)
   const handleNewChat = (chatId) => {
     setCurrentChatId(chatId)
-    // You might want to use Next.js router to navigate to the new chat
+    // Reset the refs in ChatInterface
     window.history.pushState({}, '', `/chat/${chatId}`)
   }
 
@@ -38,7 +38,7 @@ export default function Layout({ children, session }) {
 
       <div className="flex h-full justify-center rounded-lg border border-gray-200 bg-white">
         <div className="flex flex-col" style={{ width: '75%' }}>
-          <ChatInterface initialChatId={currentChatId} />
+          <ChatInterface key={currentChatId} chatId={currentChatId} />
         </div>
       </div>
     </div>

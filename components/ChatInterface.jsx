@@ -2,57 +2,21 @@
 import { useState, useRef, useEffect } from 'react'
 import ChatMessage from './ChatMessage'
 
-export default function ChatInterface({ initialChatId }) {
+export default function ChatInterface({ chatId }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [chatId, setChatId] = useState(initialChatId)
   const fileInputRef = useRef()
-
-  const chatInitializedRef = useRef(false)
-  const messagesLoadedRef = useRef(false)
-
-  useEffect(() => {
-    const initializeChat = async () => {
-      if (chatInitializedRef.current || chatId) return
-      chatInitializedRef.current = true
-
-      try {
-        // Check for existing empty chat
-        const response = await fetch('/api/chats?include_message_count=true')
-        const chats = await response.json()
-        const emptyChat = chats.find((chat) => chat.messageCount === 0)
-
-        if (emptyChat) {
-          setChatId(emptyChat.id)
-          window.history.pushState({}, '', `/chat/${emptyChat.id}`)
-          return
-        }
-        // Create new chat if no empty chat exists
-        const newChatResponse = await fetch('/api/chats', {
-          method: 'POST',
-        })
-        const newChat = await newChatResponse.json()
-        setChatId(newChat.id)
-        window.history.pushState({}, '', `/chat/${newChat.id}`)
-      } catch (error) {
-        console.error('Error creating initial chat:', error)
-      }
-    }
-
-    initializeChat()
-  }, [chatId])
 
   useEffect(() => {
     const loadMessages = async () => {
-      if (messagesLoadedRef.current || !chatId) return
+      if (!chatId) return
 
       try {
         const response = await fetch(`/api/chat/${chatId}/messages`)
         if (response.ok) {
           const data = await response.json()
           setMessages(data)
-          messagesLoadedRef.current = true
         }
       } catch (error) {
         console.error('Error loading messages:', error)
