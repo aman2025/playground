@@ -7,7 +7,7 @@ export default async function ChatPage({ params }) {
   const session = await getServerSession(authOptions)
 
   if (!session) {
-    redirect('/signin')
+    redirect(`/signin?callbackUrl=/chat/${params.chatId}`)
   }
 
   return <Layout session={session} />
