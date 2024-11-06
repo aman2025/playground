@@ -18,23 +18,21 @@ export default function ChatInterface({ initialChatId }) {
       chatInitializedRef.current = true
 
       try {
-        const getResponse = await fetch('/api/chats')
-        const chats = await getResponse.json()
+        // Check for existing empty chat
+        const response = await fetch('/api/chats?include_message_count=true')
+        const chats = await response.json()
+        const emptyChat = chats.find((chat) => chat.messageCount === 0)
 
-        for (const chat of chats) {
-          console.log('chatid:', chat.id)
-          const messagesResponse = await fetch(`/api/chat/${chat.id}/messages`)
-          const messages = await messagesResponse.json()
-          if (messages.length === 0) {
-            setChatId(chat.id)
-            window.history.pushState({}, '', `/chat/${chat.id}`)
-            return
-          }
+        if (emptyChat) {
+          setChatId(emptyChat.id)
+          window.history.pushState({}, '', `/chat/${emptyChat.id}`)
+          return
         }
-        const response = await fetch('/api/chats', {
+        // Create new chat if no empty chat exists
+        const newChatResponse = await fetch('/api/chats', {
           method: 'POST',
         })
-        const newChat = await response.json()
+        const newChat = await newChatResponse.json()
         setChatId(newChat.id)
         window.history.pushState({}, '', `/chat/${newChat.id}`)
       } catch (error) {

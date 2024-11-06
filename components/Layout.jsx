@@ -14,7 +14,7 @@ export default function Layout({ children, session }) {
   const handleNewChat = (chatId) => {
     setCurrentChatId(chatId)
     // You might want to use Next.js router to navigate to the new chat
-    window.location.href = `/chat/${chatId}`
+    window.history.pushState({}, '', `/chat/${chatId}`)
   }
 
   return (

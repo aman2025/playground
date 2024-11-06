@@ -7,17 +7,28 @@ export default function ChatHistory({ currentChatId, onNewChat }) {
   const [chats, setChats] = useState([])
 
   useEffect(() => {
-    // Fetch chat history
+    // Fetch chat history with message counts
     const fetchChats = async () => {
-      const response = await fetch('/api/chats')
+      const response = await fetch('/api/chats?include_message_count=true')
       const data = await response.json()
       setChats(data)
     }
     fetchChats()
-  }, [currentChatId]) // Refresh when currentChatId changes
+  }, [currentChatId])
 
   const handleNewChat = async () => {
     try {
+      // Check for existing empty chat
+      const emptyChat = chats.find((chat) => chat.messageCount === 0)
+      if (emptyChat) {
+        // Use existing empty chat instead of creating new one
+        if (onNewChat) {
+          onNewChat(emptyChat.id)
+        }
+        return
+      }
+
+      // Create new chat if no empty chat exists
       const response = await fetch('/api/chats', {
         method: 'POST',
       })
