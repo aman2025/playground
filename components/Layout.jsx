@@ -48,13 +48,7 @@ export default function Layout({ children, session }) {
       {/* Main content area */}
       <div className="flex h-full flex-1 justify-center rounded-lg border border-gray-200 bg-white">
         <div className="flex flex-col" style={{ width: '75%' }}>
-          {currentChatId ? (
-            <ChatInterface key={currentChatId} chatId={currentChatId} />
-          ) : (
-            <div className="flex h-full items-center justify-center text-gray-500">
-              Select a chat or start a new conversation
-            </div>
-          )}
+          <ChatInterface key={currentChatId} chatId={currentChatId} />
         </div>
       </div>
     </div>
