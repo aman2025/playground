@@ -1,4 +1,6 @@
 'use client'
+import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -11,9 +13,18 @@ import { useState } from 'react'
 // Main Layout component
 export default function Layout({ children, session }) {
   const [currentChatId, setCurrentChatId] = useState(null)
+  const pathname = usePathname()
+
+  // Handle initial route and refresh
+  useEffect(() => {
+    const match = pathname.match(/\/chat\/(.+)/)
+    if (match && match[1]) {
+      setCurrentChatId(match[1])
+    }
+  }, [pathname])
+
   const handleNewChat = (chatId) => {
     setCurrentChatId(chatId)
-    // Reset the refs in ChatInterface
     window.history.pushState({}, '', `/chat/${chatId}`)
   }
 
@@ -35,10 +46,15 @@ export default function Layout({ children, session }) {
       </aside>
 
       {/* Main content area */}
-
-      <div className="flex h-full justify-center rounded-lg border border-gray-200 bg-white">
+      <div className="flex h-full flex-1 justify-center rounded-lg border border-gray-200 bg-white">
         <div className="flex flex-col" style={{ width: '75%' }}>
-          <ChatInterface key={currentChatId} chatId={currentChatId} />
+          {currentChatId ? (
+            <ChatInterface key={currentChatId} chatId={currentChatId} />
+          ) : (
+            <div className="flex h-full items-center justify-center text-gray-500">
+              Select a chat or start a new conversation
+            </div>
+          )}
         </div>
       </div>
     </div>
