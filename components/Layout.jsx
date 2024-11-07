@@ -1,14 +1,10 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Paperclip, Send } from 'lucide-react'
 import ChatHistory from './ChatHistory'
 import UserProfile from './UserProfile'
 import ChatInterface from './ChatInterface'
-import { useState } from 'react'
 
 // Main Layout component
 export default function Layout({ children, session }) {
@@ -39,7 +35,7 @@ export default function Layout({ children, session }) {
         </div>
 
         {/* Main sidebar content - History */}
-        <ChatHistory currentChatId={currentChatId} onNewChat={handleNewChat} />
+        <ChatHistory />
 
         {/* Footer - User profile */}
         <UserProfile session={session} />
@@ -48,7 +44,7 @@ export default function Layout({ children, session }) {
       {/* Main content area */}
       <div className="flex h-full flex-1 justify-center rounded-lg border border-gray-200 bg-white">
         <div className="flex flex-col" style={{ width: '75%' }}>
-          <ChatInterface key={currentChatId} chatId={currentChatId} />
+          <ChatInterface />
         </div>
       </div>
     </div>

@@ -1,22 +1,28 @@
 'use client'
 import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useChatStore } from '../store/chatStore'
 
 // ChatInputForm component handles message input and file attachment
-export default function ChatInputForm({ chatId, onSuccess, isLoading, setIsLoading }) {
+export default function ChatInputForm({ chatId, isLoading, setIsLoading }) {
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
-  const router = useRouter()
+  const { addChat, setCurrentChatId, addMessage, setMessages } = useChatStore()
 
-  // Handle form submission and API call
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!input.trim()) return
 
     setIsLoading(true)
     try {
+      const formData = new FormData()
+      formData.append('content', input)
+      if (fileInputRef.current?.files?.[0]) {
+        formData.append('image', fileInputRef.current.files[0])
+      }
+
+      let response
       if (!chatId) {
-        // Create new chat using the input text as title
+        // Create new chat
         const createChatResponse = await fetch('/api/chats', {
           method: 'POST',
           headers: {
@@ -25,39 +31,31 @@ export default function ChatInputForm({ chatId, onSuccess, isLoading, setIsLoadi
           body: JSON.stringify({ title: input.trim() }),
         })
         const newChat = await createChatResponse.json()
+        console.log('New chat created:', newChat) // Debug log
+        addChat(newChat)
+        setCurrentChatId(newChat.id)
 
-        // Create the first message
-        const formData = new FormData()
-        formData.append('content', input)
-        if (fileInputRef.current?.files?.[0]) {
-          formData.append('image', fileInputRef.current.files[0])
-        }
-
-        const messageResponse = await fetch(`/api/chat/${newChat.id}/messages`, {
+        // Send the first message
+        response = await fetch(`/api/chat/${newChat.id}/messages`, {
           method: 'POST',
           body: formData,
         })
-        const newMessages = await messageResponse.json()
-
-        // Update UI and redirect
-        onSuccess(newMessages, newChat.id)
-        window.history.pushState({}, '', `/chat/${newChat.id}`)
-        // Dispatch custom event with new chat data
-        window.dispatchEvent(new CustomEvent('newChat', { detail: newChat }))
       } else {
-        // Just send message for existing chat
-        const formData = new FormData()
-        formData.append('content', input)
-        if (fileInputRef.current?.files?.[0]) {
-          formData.append('image', fileInputRef.current.files[0])
-        }
-
-        const response = await fetch(`/api/chat/${chatId}/messages`, {
+        // Send message to existing chat
+        response = await fetch(`/api/chat/${chatId}/messages`, {
           method: 'POST',
           body: formData,
         })
-        const newMessages = await response.json()
-        onSuccess(newMessages)
+      }
+
+      const newMessage = await response.json()
+      console.log('New message received:', newMessage) // Debug log
+
+      // Update messages in the store
+      if (Array.isArray(newMessage)) {
+        setMessages((prev) => [...prev, ...newMessage])
+      } else {
+        addMessage(newMessage)
       }
     } catch (error) {
       console.error('Error:', error)

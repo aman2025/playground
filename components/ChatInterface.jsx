@@ -1,21 +1,36 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ChatMessage from './ChatMessage'
 import ChatInputForm from './ChatInputForm'
+import { useChatStore } from '../store/chatStore'
 
-export default function ChatInterface({ chatId }) {
-  const [messages, setMessages] = useState([])
+export default function ChatInterface() {
+  const { messages, setMessages, currentChatId } = useChatStore()
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
+    console.log('Messages updated:', messages)
+  }, [messages])
+
+  useEffect(() => {
     const loadMessages = async () => {
-      if (!chatId) return
+      if (!currentChatId) {
+        console.warn('No currentChatId set, cannot load messages')
+        return
+      }
 
       try {
-        const response = await fetch(`/api/chat/${chatId}/messages`)
+        const response = await fetch(`/api/chat/${currentChatId}/messages`)
         if (response.ok) {
           const data = await response.json()
-          setMessages(data)
+          if (Array.isArray(data) && data.length > 0) {
+            console.log('Loaded messages from API:', data)
+            setMessages(data)
+          } else {
+            console.warn('Received empty or invalid messages array:', data)
+          }
+        } else {
+          console.error('Failed to fetch messages, response not ok:', response.status)
         }
       } catch (error) {
         console.error('Error loading messages:', error)
@@ -23,10 +38,14 @@ export default function ChatInterface({ chatId }) {
     }
 
     loadMessages()
-  }, [chatId])
+  }, [currentChatId, setMessages])
 
-  const handleSuccess = (newMessages) => {
-    setMessages((prev) => [...prev, ...newMessages])
+  const handleNewMessage = (newMessage) => {
+    console.log('New message received:', newMessage)
+    setMessages((prevMessages) => {
+      const currentMessages = Array.isArray(prevMessages) ? prevMessages : []
+      return [...currentMessages, newMessage]
+    })
   }
 
   return (
@@ -39,10 +58,10 @@ export default function ChatInterface({ chatId }) {
         )}
       </div>
       <ChatInputForm
-        chatId={chatId}
-        onSuccess={handleSuccess}
+        chatId={currentChatId}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
+        onMessageSent={handleNewMessage}
       />
     </div>
   )
