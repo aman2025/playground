@@ -8,14 +8,25 @@ export default function ChatHistory({ currentChatId, onNewChat }) {
   const [chats, setChats] = useState([])
   const pathname = usePathname()
 
+  // Keep fetchChats for initial load and potential refetches
+  const fetchChats = async () => {
+    const response = await fetch('/api/chats?include_message_count=true')
+    const data = await response.json()
+    setChats(data)
+  }
+
   useEffect(() => {
-    // Only fetch chats on initial load, not when currentChatId changes
-    const fetchChats = async () => {
-      const response = await fetch('/api/chats?include_message_count=true')
-      const data = await response.json()
-      setChats(data)
-    }
+    // Initial fetch when component mounts
     fetchChats()
+
+    // Listen for new chat events
+    const handleNewChat = (e) => {
+      const newChat = e.detail
+      setChats((prev) => [newChat, ...prev])
+    }
+
+    window.addEventListener('newChat', handleNewChat)
+    return () => window.removeEventListener('newChat', handleNewChat)
   }, [])
 
   const handleNewChat = async () => {

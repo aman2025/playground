@@ -41,7 +41,9 @@ export default function ChatInputForm({ chatId, onSuccess, isLoading, setIsLoadi
 
         // Update UI and redirect
         onSuccess(newMessages, newChat.id)
-        router.push(`/chat/${newChat.id}`)
+        window.history.pushState({}, '', `/chat/${newChat.id}`)
+        // Dispatch custom event with new chat data
+        window.dispatchEvent(new CustomEvent('newChat', { detail: newChat }))
       } else {
         // Just send message for existing chat
         const formData = new FormData()
