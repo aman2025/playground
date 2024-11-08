@@ -31,27 +31,27 @@ export default function ChatInputForm({ chatId, isLoading, setIsLoading }) {
           body: JSON.stringify({ title: input.trim() }),
         })
         const newChat = await createChatResponse.json()
-        addChat(newChat)
-        setCurrentChatId(newChat.id)
-
         // Send the first message
         response = await fetch(`/api/chat/${newChat.id}/messages`, {
           method: 'POST',
           body: formData,
         })
+        // 等创建chat和message成功后，再更新store
+        if (response.ok) {
+          addChat(newChat)
+          setCurrentChatId(newChat.id)
+          window.history.pushState({}, '', `/chat/${newChat.id}`)
+        }
       } else {
         // Send message to existing chat
         response = await fetch(`/api/chat/${chatId}/messages`, {
           method: 'POST',
           body: formData,
         })
+        const newMessage = await response.json()
+        // Update messages in the store
+        addMessage(newMessage)
       }
-
-      const newMessage = await response.json()
-
-      // Update messages in the store
-      console.log('New message received:', newMessage) // Debug log
-      addMessage(newMessage)
     } catch (error) {
       console.error('Error:', error)
     } finally {
