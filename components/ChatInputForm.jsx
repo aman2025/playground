@@ -6,7 +6,7 @@ import { useChatStore } from '../store/chatStore'
 export default function ChatInputForm({ chatId, isLoading, setIsLoading }) {
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
-  const { addChat, setCurrentChatId, addMessage, setMessages } = useChatStore()
+  const { addChat, setCurrentChatId, addMessage } = useChatStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -31,7 +31,6 @@ export default function ChatInputForm({ chatId, isLoading, setIsLoading }) {
           body: JSON.stringify({ title: input.trim() }),
         })
         const newChat = await createChatResponse.json()
-        console.log('New chat created:', newChat) // Debug log
         addChat(newChat)
         setCurrentChatId(newChat.id)
 
@@ -49,14 +48,10 @@ export default function ChatInputForm({ chatId, isLoading, setIsLoading }) {
       }
 
       const newMessage = await response.json()
-      console.log('New message received:', newMessage) // Debug log
 
       // Update messages in the store
-      if (Array.isArray(newMessage)) {
-        setMessages((prev) => [...prev, ...newMessage])
-      } else {
-        addMessage(newMessage)
-      }
+      console.log('New message received:', newMessage) // Debug log
+      addMessage(newMessage)
     } catch (error) {
       console.error('Error:', error)
     } finally {

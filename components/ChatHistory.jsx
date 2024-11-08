@@ -24,14 +24,14 @@ export default function ChatHistory() {
   }
 
   return (
-    <div className="w-64 bg-gray-800 p-4 text-white">
+    <div className="">
       <div className="space-y-2">
         {chats.map((chat) => (
           <button
             key={chat.id}
             onClick={() => handleChatClick(chat.id)}
             className={`block w-full rounded p-2 text-left ${
-              currentChatId === chat.id ? 'bg-gray-700' : 'hover:bg-gray-700'
+              currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
             }`}
           >
             {chat.title}

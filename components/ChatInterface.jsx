@@ -9,13 +9,8 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    console.log('Messages updated:', messages)
-  }, [messages])
-
-  useEffect(() => {
     const loadMessages = async () => {
       if (!currentChatId) {
-        console.warn('No currentChatId set, cannot load messages')
         return
       }
 
@@ -24,13 +19,8 @@ export default function ChatInterface() {
         if (response.ok) {
           const data = await response.json()
           if (Array.isArray(data) && data.length > 0) {
-            console.log('Loaded messages from API:', data)
             setMessages(data)
-          } else {
-            console.warn('Received empty or invalid messages array:', data)
           }
-        } else {
-          console.error('Failed to fetch messages, response not ok:', response.status)
         }
       } catch (error) {
         console.error('Error loading messages:', error)
@@ -39,14 +29,6 @@ export default function ChatInterface() {
 
     loadMessages()
   }, [currentChatId, setMessages])
-
-  const handleNewMessage = (newMessage) => {
-    console.log('New message received:', newMessage)
-    setMessages((prevMessages) => {
-      const currentMessages = Array.isArray(prevMessages) ? prevMessages : []
-      return [...currentMessages, newMessage]
-    })
-  }
 
   return (
     <div className="flex h-full flex-col">
@@ -57,12 +39,7 @@ export default function ChatInterface() {
           messages.map((message) => <ChatMessage key={message.id} message={message} />)
         )}
       </div>
-      <ChatInputForm
-        chatId={currentChatId}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        onMessageSent={handleNewMessage}
-      />
+      <ChatInputForm chatId={currentChatId} isLoading={isLoading} setIsLoading={setIsLoading} />
     </div>
   )
 }
