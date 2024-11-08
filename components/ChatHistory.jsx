@@ -1,6 +1,6 @@
 'use client'
 import { useEffect } from 'react'
-import { useChatStore } from '../store/chatStore'
+import { useChatStore } from '@/store/chatStore'
 
 // Component to display chat history in sidebar
 export default function ChatHistory() {

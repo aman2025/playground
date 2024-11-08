@@ -1,28 +1,24 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
-import ChatHistory from './ChatHistory'
-import UserProfile from './UserProfile'
-import ChatInterface from './ChatInterface'
+import { useChatStore } from '@/store/chatStore'
+import ChatHistory from '@/components/ChatHistory'
+import UserProfile from '@/components/UserProfile'
+import ChatInterface from '@/components/ChatInterface'
 
 // Main Layout component
 export default function Layout({ children, session }) {
-  const [currentChatId, setCurrentChatId] = useState(null)
+  const { setCurrentChatId } = useChatStore()
   const pathname = usePathname()
 
-  // Handle initial route and refresh
+  // Handle initial route and refresh, load current chat id from url
   useEffect(() => {
     const match = pathname.match(/\/chat\/(.+)/)
     if (match && match[1]) {
       setCurrentChatId(match[1])
     }
-  }, [pathname])
-
-  const handleNewChat = (chatId) => {
-    setCurrentChatId(chatId)
-    window.history.pushState({}, '', `/chat/${chatId}`)
-  }
+  }, [pathname, setCurrentChatId])
 
   return (
     <div className="flex h-screen" style={{ backgroundColor: '#f9fafb' }}>
