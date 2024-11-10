@@ -1,8 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
-import Layout from '@/components/Layout'
-import Image from 'next/image'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+
 export default async function Home() {
   // Fetch session data
   const session = await getServerSession(authOptions)
@@ -11,8 +10,11 @@ export default async function Home() {
     redirect('/signin')
   }
 
-  return (
-    // Pass session as a prop to Layout
-    <Layout session={session}></Layout>
-  )
+  // Redirect authenticated users to the chat page
+  redirect('/chat')
+
+  // The code below will never be reached due to the redirect
+  // return (
+  //   <Layout session={session}></Layout>
+  // )
 }
