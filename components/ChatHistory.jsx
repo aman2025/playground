@@ -5,14 +5,12 @@ import { chatApi } from '@/services/api'
 
 // Component to display chat history in sidebar
 export default function ChatHistory() {
-  const { setChats, setCurrentChatId, currentChatId } = useChatStore()
+  const { setCurrentChatId, currentChatId } = useChatStore()
 
   // Fetch chats using React Query
   const { data: chats = [] } = useQuery({
     queryKey: ['chats'],
     queryFn: chatApi.getAllChats,
-    onSuccess: (data) => setChats(data),
-    onError: () => setChats([]),
   })
 
   const handleChatClick = (chatId) => {

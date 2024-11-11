@@ -9,7 +9,7 @@ export default function ChatInputForm({ chatId }) {
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
-  const { addChat, setCurrentChatId, addMessage } = useChatStore()
+  const { setCurrentChatId } = useChatStore()
 
   // Mutation for creating a new chat
   const createChatMutation = useMutation({
@@ -18,7 +18,6 @@ export default function ChatInputForm({ chatId }) {
       return newChat
     },
     onSuccess: (newChat) => {
-      addChat(newChat)
       setCurrentChatId(newChat.id)
       window.history.pushState({}, '', `/chat/${newChat.id}`)
       queryClient.invalidateQueries(['chats'])
@@ -32,9 +31,7 @@ export default function ChatInputForm({ chatId }) {
       const response = await chatApi.sendMessage(chatId, formData)
       return response
     },
-    onSuccess: (newMessage) => {
-      // Add message to store
-      addMessage(newMessage[0])
+    onSuccess: () => {
       // Invalidate messages query for this chat
       queryClient.invalidateQueries(['messages', chatId])
     },
@@ -55,31 +52,12 @@ export default function ChatInputForm({ chatId }) {
         // Create new chat first, then send the message
         const newChat = await createChatMutation.mutateAsync(input.trim())
 
-        // Create a message object for the store
-        const messageContent = {
-          content: formData.get('content'),
-          role: 'user',
-          chatId: newChat.id,
-        }
-        // Add optimistic update
-        addMessage(messageContent)
-
         // Send the first message using the new chat ID
         await sendMessageMutation.mutateAsync({
           chatId: newChat.id,
           formData,
         })
       } else {
-        // Create a message object for the store
-        const messageContent = {
-          content: formData.get('content'),
-          role: 'user',
-          chatId: chatId,
-        }
-        // Add optimistic update
-        addMessage(messageContent)
-
-        // Send message
         await sendMessageMutation.mutateAsync({ chatId, formData })
       }
     } catch (error) {
