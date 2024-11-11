@@ -21,7 +21,8 @@ api.interceptors.response.use(
 export const chatApi = {
   // Get all chats with message count
   getAllChats: () => api.get('/chats', { params: { include_message_count: true } }),
-  // Add other chat-related API calls here
+
+  // Create a new chat
   createChat: (title) => api.post('/chats', { title }),
 
   // Send message to a chat

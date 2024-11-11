@@ -1,5 +1,5 @@
 'use client'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import ChatMessage from './ChatMessage'
 import ChatInputForm from './ChatInputForm'
 import { useChatStore } from '../store/chatStore'
@@ -7,7 +7,6 @@ import { chatApi } from '../services/api'
 
 export default function ChatInterface() {
   const { currentChatId } = useChatStore()
-  const queryClient = useQueryClient()
 
   // Fetch messages using React Query
   const {
@@ -32,14 +31,6 @@ export default function ChatInterface() {
       return Array.isArray(data) ? data : []
     },
   })
-
-  // Prefetch messages for next chat
-  const prefetchMessages = async (chatId) => {
-    await queryClient.prefetchQuery({
-      queryKey: ['messages', chatId],
-      queryFn: () => chatApi.getMessages(chatId),
-    })
-  }
 
   return (
     <div className="flex h-full flex-col">
