@@ -1,41 +1,28 @@
 'use client'
-import { useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useChatStore } from '@/store/chatStore'
+import { chatApi } from '@/services/api'
 
 // Component to display chat history in sidebar
 export default function ChatHistory() {
-  const { chats, setChats, setCurrentChatId, currentChatId } = useChatStore()
+  const { setChats, setCurrentChatId, currentChatId } = useChatStore()
 
-  // Fetch chats on initial load
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const response = await fetch('/api/chats?include_message_count=true')
-        if (!response.ok) {
-          throw new Error('Failed to fetch chats')
-        }
-        const data = await response.json()
-        setChats(data)
-      } catch (error) {
-        console.error('Error fetching chats:', error)
-        // Set empty array to prevent map errors
-        setChats([])
-      }
-    }
-    fetchChats()
-  }, [setChats])
+  // Fetch chats using React Query
+  const { data: chats = [] } = useQuery({
+    queryKey: ['chats'],
+    queryFn: chatApi.getAllChats,
+    onSuccess: (data) => setChats(data),
+    onError: () => setChats([]),
+  })
 
   const handleChatClick = (chatId) => {
     setCurrentChatId(chatId)
     window.history.pushState({}, '', `/chat/${chatId}`)
-
-    // No need to use router.push, just update the state
   }
 
   return (
     <div className="">
       <div className="space-y-2">
-        {/* Add null check before mapping */}
         {chats.map((chat) => (
           <button
             key={chat.id}
