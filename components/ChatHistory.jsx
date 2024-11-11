@@ -9,9 +9,18 @@ export default function ChatHistory() {
   // Fetch chats on initial load
   useEffect(() => {
     const fetchChats = async () => {
-      const response = await fetch('/api/chats?include_message_count=true')
-      const data = await response.json()
-      setChats(data)
+      try {
+        const response = await fetch('/api/chats?include_message_count=true')
+        if (!response.ok) {
+          throw new Error('Failed to fetch chats')
+        }
+        const data = await response.json()
+        setChats(data)
+      } catch (error) {
+        console.error('Error fetching chats:', error)
+        // Set empty array to prevent map errors
+        setChats([])
+      }
     }
     fetchChats()
   }, [setChats])
@@ -26,6 +35,7 @@ export default function ChatHistory() {
   return (
     <div className="">
       <div className="space-y-2">
+        {/* Add null check before mapping */}
         {chats.map((chat) => (
           <button
             key={chat.id}
