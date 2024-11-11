@@ -43,14 +43,24 @@ export default function ChatInputForm({ chatId, isLoading, setIsLoading }) {
           window.history.pushState({}, '', `/chat/${newChat.id}`)
         }
       } else {
+        // Create a message object from formData
+        const messageContent = {
+          content: formData.get('content'),
+          role: 'user',
+          chatId: chatId,
+          // Add any other required message properties
+        }
+        // Add message to store with proper object format
+        addMessage(messageContent)
+
         // Send message to existing chat
         response = await fetch(`/api/chat/${chatId}/messages`, {
           method: 'POST',
           body: formData,
         })
         const newMessage = await response.json()
-        // Update messages in the store
-        addMessage(newMessage)
+        // Update messages in the store with the server response
+        addMessage(newMessage[0])
       }
     } catch (error) {
       console.error('Error:', error)

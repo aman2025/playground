@@ -12,7 +12,7 @@ export const useChatStore = create((set, get) => ({
   },
   addMessage: (newMessage) => {
     set((state) => ({
-      messages: [...state.messages, ...newMessage],
+      messages: [...state.messages, newMessage],
     }))
   },
   setCurrentChatId: (chatId) => set({ currentChatId: chatId }),

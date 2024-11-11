@@ -99,7 +99,7 @@ export async function POST(request, { params }) {
       })
     }
 
-    return NextResponse.json([userMessage, assistantMessage])
+    return NextResponse.json([assistantMessage])
   } catch (error) {
     console.error('Error processing message:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
