@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useChatStore } from '@/store/chatStore'
 import { chatApi } from '@/services/api'
 import { Trash2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 // Component to display chat history in sidebar
 export default function ChatHistory() {
@@ -53,8 +54,22 @@ export default function ChatHistory() {
     window.history.pushState({}, '', `/chat/${chatId}`)
   }
 
+  const router = useRouter()
+
+  const handleNewChat = () => {
+    setCurrentChatId(null)
+    router.push('/chat')
+  }
+
   return (
-    <div className="">
+    <div className="space-y-4">
+      <button
+        onClick={handleNewChat}
+        className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      >
+        New Chat
+      </button>
+
       <div className="space-y-2">
         {chats.map((chat) => (
           <div
