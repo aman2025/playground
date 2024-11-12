@@ -48,5 +48,5 @@ model Message {
   chatId    String
   imageUrl  String?  // Optional field for image messages
   createdAt DateTime @default(now())
-  chat      Chat     @relation(fields: [chatId], references: [id])
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
 }

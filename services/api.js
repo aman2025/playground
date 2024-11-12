@@ -45,4 +45,14 @@ export const chatApi = {
       return [] // Return empty array on error
     }
   },
+
+  deleteChat: async (chatId) => {
+    const response = await fetch(`/api/chats/${chatId}`, {
+      method: 'DELETE',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to delete chat')
+    }
+    return response.json()
+  },
 }
