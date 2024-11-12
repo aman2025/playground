@@ -20,8 +20,11 @@ export default function ChatHistory() {
   // Add delete mutation
   const deleteMutation = useMutation({
     mutationFn: chatApi.deleteChat,
-    onSuccess: () => {
-      // Invalidate and refetch chats
+    onMutate: (deletedChatId) => {
+      return { deletedChatId }
+    },
+    onSuccess: (_, __, context) => {
+      const { deletedChatId } = context
       queryClient.invalidateQueries({ queryKey: ['chats'] })
 
       // If deleted chat was current, switch to next available chat
@@ -54,10 +57,10 @@ export default function ChatHistory() {
     <div className="">
       <div className="space-y-2">
         {chats.map((chat) => (
-          <button
+          <div
             key={chat.id}
             onClick={() => handleChatClick(chat.id)}
-            className={`block flex w-full items-center justify-between rounded p-2 text-left ${
+            className={`block flex w-full cursor-pointer items-center justify-between rounded p-2 text-left ${
               currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
             }`}
           >
@@ -68,7 +71,7 @@ export default function ChatHistory() {
             >
               <Trash2 className="h-4 w-4 text-gray-500" />
             </button>
-          </button>
+          </div>
         ))}
       </div>
     </div>
