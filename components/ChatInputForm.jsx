@@ -20,7 +20,6 @@ export default function ChatInputForm({ chatId }) {
     onSuccess: (newChat) => {
       setCurrentChatId(newChat.id)
       window.history.pushState({}, '', `/chat/${newChat.id}`)
-      queryClient.invalidateQueries(['chats'])
       return newChat
     },
   })
@@ -32,7 +31,8 @@ export default function ChatInputForm({ chatId }) {
       return response
     },
     onSuccess: () => {
-      // Invalidate messages query for this chat
+      // Invalidate both chats and messages queries after message is sent
+      queryClient.invalidateQueries(['chats'])
       queryClient.invalidateQueries(['messages', chatId])
     },
   })
@@ -49,10 +49,10 @@ export default function ChatInputForm({ chatId }) {
       }
 
       if (!chatId) {
-        // Create new chat first, then send the message
+        // Wait for chat creation before sending message
         const newChat = await createChatMutation.mutateAsync(input.trim())
 
-        // Send the first message using the new chat ID
+        // Wait for message to be sent
         await sendMessageMutation.mutateAsync({
           chatId: newChat.id,
           formData,
