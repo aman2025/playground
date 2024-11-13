@@ -6,6 +6,7 @@ import { useChatStore } from '../store/chatStore'
 
 // ChatInputForm component handles message input and file attachment
 export default function ChatInputForm({ chatId }) {
+  console.log('ChatInputForm')
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
@@ -32,8 +33,10 @@ export default function ChatInputForm({ chatId }) {
     },
     onSuccess: () => {
       // Invalidate both chats and messages queries after message is sent
-      queryClient.invalidateQueries(['chats'])
-      queryClient.invalidateQueries(['messages', chatId])
+      queryClient.invalidateQueries({
+        queryKey: ['messages', chatId],
+        exact: true,
+      })
     },
   })
 
@@ -51,6 +54,7 @@ export default function ChatInputForm({ chatId }) {
       if (!chatId) {
         // Wait for chat creation before sending message
         const newChat = await createChatMutation.mutateAsync(input.trim())
+        queryClient.invalidateQueries(['chats'])
 
         // Wait for message to be sent
         await sendMessageMutation.mutateAsync({

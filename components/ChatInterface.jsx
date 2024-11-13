@@ -6,6 +6,7 @@ import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 
 export default function ChatInterface() {
+  console.log('ChatInterface')
   const { currentChatId } = useChatStore()
 
   // Fetch messages using React Query

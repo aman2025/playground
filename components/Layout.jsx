@@ -9,6 +9,7 @@ import ChatInterface from '@/components/ChatInterface'
 
 // Main Layout component
 export default function Layout({ session }) {
+  console.log('layout')
   const { setCurrentChatId } = useChatStore()
   const pathname = usePathname()
 
