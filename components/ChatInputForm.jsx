@@ -31,8 +31,34 @@ export default function ChatInputForm({ chatId }) {
       const response = await chatApi.sendMessage(chatId, formData)
       return response
     },
-    onSuccess: () => {
-      // Invalidate both chats and messages queries after message is sent
+    onMutate: async ({ chatId, formData }) => {
+      // Cancel any outgoing refetches to avoid overwriting our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['messages', chatId] })
+
+      // Snapshot the previous value
+      const previousMessages = queryClient.getQueryData(['messages', chatId])
+
+      // Optimistically update the messages cache
+      const optimisticMessage = {
+        id: 'temp-' + Date.now(), // Temporary ID
+        content: formData.get('content'),
+        role: 'user',
+        image: formData.get('image') ? URL.createObjectURL(formData.get('image')) : null,
+        createdAt: new Date().toISOString(),
+        // Add any other required message properties
+      }
+
+      queryClient.setQueryData(['messages', chatId], (old) => [...(old || []), optimisticMessage])
+
+      // Return a context object with the snapshot
+      return { previousMessages }
+    },
+    onError: (err, newMessage, context) => {
+      // If the mutation fails, roll back to the previous state
+      queryClient.setQueryData(['messages', chatId], context.previousMessages)
+    },
+    onSuccess: (newMessage, { chatId }) => {
+      // Invalidate and refetch
       queryClient.invalidateQueries({
         queryKey: ['messages', chatId],
         exact: true,
