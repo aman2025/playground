@@ -8,7 +8,7 @@ import UserProfile from '@/components/UserProfile'
 import ChatInterface from '@/components/ChatInterface'
 
 // Main Layout component
-export default function Layout({ children, session }) {
+export default function Layout({ session }) {
   const { setCurrentChatId } = useChatStore()
   const pathname = usePathname()
 
