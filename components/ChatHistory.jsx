@@ -4,6 +4,8 @@ import { useChatStore } from '@/store/chatStore'
 import { chatApi } from '@/services/api'
 import { Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { useState } from 'react'
 
 // Component to display chat history in sidebar
 export default function ChatHistory() {
@@ -43,10 +45,20 @@ export default function ChatHistory() {
     },
   })
 
-  const handleDelete = async (e, chatId) => {
+  // Add state for delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [chatToDelete, setChatToDelete] = useState(null)
+
+  const handleDelete = (e, chatId) => {
     e.stopPropagation() // Prevent chat selection when clicking delete
-    if (window.confirm('Are you sure you want to delete this chat?')) {
-      await deleteMutation.mutate(chatId)
+    setChatToDelete(chatId)
+    setDeleteDialogOpen(true)
+  }
+
+  // Handle confirm delete action
+  const handleConfirmDelete = async () => {
+    if (chatToDelete) {
+      await deleteMutation.mutate(chatToDelete)
     }
   }
 
@@ -81,12 +93,22 @@ export default function ChatHistory() {
             }`}
           >
             <span>{chat.title}</span>
-            <button
-              onClick={(e) => handleDelete(e, chat.id)}
-              className="rounded p-1 hover:bg-gray-300"
+            <ConfirmDialog
+              open={deleteDialogOpen}
+              onOpenChange={setDeleteDialogOpen}
+              title="Delete Chat"
+              description="Are you sure you want to delete this chat? This action cannot be undone."
+              onConfirm={handleConfirmDelete}
+              confirmText="Delete"
+              confirmVariant="destructive"
             >
-              <Trash2 className="h-4 w-4 text-gray-500" />
-            </button>
+              <button
+                onClick={(e) => handleDelete(e, chat.id)}
+                className="rounded p-1 hover:bg-gray-300"
+              >
+                <Trash2 className="h-4 w-4 text-gray-500" />
+              </button>
+            </ConfirmDialog>
           </div>
         ))}
       </div>
