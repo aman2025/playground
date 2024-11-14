@@ -4,9 +4,11 @@ import ChatMessage from './ChatMessage'
 import ChatInputForm from './ChatInputForm'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
+import { useState } from 'react'
 
 export default function ChatInterface() {
   console.log('ChatInterface')
+  const [isSending, setIsSending] = useState(false)
   const { currentChatId } = useChatStore()
 
   // Fetch messages using React Query
@@ -55,10 +57,17 @@ export default function ChatInterface() {
             {messages.map((message) => (
               <ChatMessage key={message.id} message={message} />
             ))}
+            <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
+              <div className="dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
           </div>
         )}
       </div>
-      <ChatInputForm chatId={currentChatId} isLoading={isLoading} />
+      <ChatInputForm chatId={currentChatId} onSendingStateChange={setIsSending} />
     </div>
   )
 }

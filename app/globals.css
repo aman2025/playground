@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -10,73 +11,114 @@ html, body {
   :root {
     --background: 210 100% 95%;
     --foreground: 210 100% 20%;
- 
+
     --muted: 210 50% 90%;
     --muted-foreground: 210 50% 40%;
- 
+
     --popover: 210 100% 95%;
     --popover-foreground: 210 100% 20%;
- 
+
     --card: 210 100% 95%;
     --card-foreground: 210 100% 20%;
- 
+
     --border: 210 50% 85%;
     --input: 210 50% 85%;
- 
+
     --primary: 210 100% 30%;
     --primary-foreground: 210 100% 95%;
- 
+
     --secondary: 210 50% 90%;
     --secondary-foreground: 210 100% 30%;
- 
+
     --accent: 210 50% 90%;
     --accent-foreground: 210 100% 30%;
- 
+
     --destructive: 210 100% 50%;
     --destructive-foreground: 210 100% 95%;
- 
+
     --ring: 210 50% 70%;
- 
+
     --radius: 0.5rem;
   }
- 
+
   .dark {
     --background: 210 100% 20%;
     --foreground: 210 100% 95%;
- 
+
     --muted: 210 50% 30%;
     --muted-foreground: 210 50% 70%;
- 
+
     --popover: 210 100% 20%;
     --popover-foreground: 210 100% 95%;
- 
+
     --card: 210 100% 20%;
     --card-foreground: 210 100% 95%;
- 
+
     --border: 210 50% 30%;
     --input: 210 50% 30%;
- 
+
     --primary: 210 100% 95%;
     --primary-foreground: 210 100% 30%;
- 
+
     --secondary: 210 50% 30%;
     --secondary-foreground: 210 100% 95%;
- 
+
     --accent: 210 50% 30%;
     --accent-foreground: 210 100% 95%;
- 
+
     --destructive: 210 100% 40%;
     --destructive-foreground: 210 100% 95%;
- 
+
     --ring: 210 50% 30%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+.typing-indicator {
+  display: none;
+  padding: 20px;
+}
+
+.typing-indicator.active {
+  display: block;
+}
+
+.dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dots span {
+  width: 8px;
+  height: 8px;
+  background-color: #8b8b8b;
+  border-radius: 50%;
+  animation: bounce 1.5s infinite;
+}
+
+.dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-4px);
   }
 }

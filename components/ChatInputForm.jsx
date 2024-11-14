@@ -1,11 +1,11 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { chatApi } from '../services/api'
 import { useChatStore } from '../store/chatStore'
 
 // ChatInputForm component handles message input and file attachment
-export default function ChatInputForm({ chatId }) {
+export default function ChatInputForm({ chatId, onSendingStateChange }) {
   console.log('ChatInputForm')
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
@@ -80,7 +80,8 @@ export default function ChatInputForm({ chatId }) {
       if (!chatId) {
         // Wait for chat creation before sending message
         const newChat = await createChatMutation.mutateAsync(input.trim())
-        queryClient.invalidateQueries(['chats'])
+        // Invalidate chats query, update the chat list
+        queryClient.invalidateQueries({ queryKey: ['chats'] })
 
         // Wait for message to be sent
         await sendMessageMutation.mutateAsync({
@@ -101,7 +102,12 @@ export default function ChatInputForm({ chatId }) {
   }
 
   // Loading state is now derived from mutations
-  const isMutating = createChatMutation.isPending || sendMessageMutation.isPending
+  const isSending = createChatMutation.isPending || sendMessageMutation.isPending
+
+  // Create a useEffect to notify parent of sending state changes
+  useEffect(() => {
+    onSendingStateChange(isSending)
+  }, [createChatMutation.isPending, sendMessageMutation.isPending, onSendingStateChange])
 
   return (
     <form onSubmit={handleSubmit} className="border-t p-4">
@@ -121,16 +127,16 @@ export default function ChatInputForm({ chatId }) {
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 rounded border p-2"
             placeholder="Type a message..."
-            disabled={isMutating}
+            disabled={isSending}
           />
           <button
             type="submit"
             className={`rounded px-4 py-2 text-white ${
-              isMutating ? 'cursor-not-allowed bg-blue-300' : 'bg-blue-500 hover:bg-blue-600'
+              isSending ? 'cursor-not-allowed bg-blue-300' : 'bg-blue-500 hover:bg-blue-600'
             }`}
-            disabled={isMutating || !input.trim()}
+            disabled={isSending || !input.trim()}
           >
-            {isMutating ? 'Sending...' : 'Send'}
+            {isSending ? 'Sending...' : 'Send'}
           </button>
         </div>
       </div>
