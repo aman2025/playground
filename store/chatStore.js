@@ -4,4 +4,6 @@ import { create } from 'zustand'
 export const useChatStore = create((set, get) => ({
   currentChatId: null,
   setCurrentChatId: (chatId) => set({ currentChatId: chatId }),
+  isSending: false,
+  setIsSending: (state) => set({ isSending: state }),
 }))

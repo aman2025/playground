@@ -4,12 +4,9 @@ import ChatMessage from './ChatMessage'
 import ChatInputForm from './ChatInputForm'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
-import { useState } from 'react'
 
 export default function ChatInterface() {
-  console.log('ChatInterface')
-  const [isSending, setIsSending] = useState(false)
-  const { currentChatId } = useChatStore()
+  const { currentChatId, isSending } = useChatStore()
 
   // Fetch messages using React Query
   const {
@@ -67,7 +64,7 @@ export default function ChatInterface() {
           </div>
         )}
       </div>
-      <ChatInputForm chatId={currentChatId} onSendingStateChange={setIsSending} />
+      <ChatInputForm chatId={currentChatId} />
     </div>
   )
 }

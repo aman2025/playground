@@ -5,12 +5,12 @@ import { chatApi } from '../services/api'
 import { useChatStore } from '../store/chatStore'
 
 // ChatInputForm component handles message input and file attachment
-export default function ChatInputForm({ chatId, onSendingStateChange }) {
+export default function ChatInputForm({ chatId }) {
   console.log('ChatInputForm')
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
-  const { setCurrentChatId } = useChatStore()
+  const { setCurrentChatId, setIsSending } = useChatStore()
 
   // Mutation for creating a new chat
   const createChatMutation = useMutation({
@@ -101,13 +101,11 @@ export default function ChatInputForm({ chatId, onSendingStateChange }) {
     }
   }
 
-  // Loading state is now derived from mutations
-  const isSending = createChatMutation.isPending || sendMessageMutation.isPending
-
-  // Create a useEffect to notify parent of sending state changes
+  // Update useEffect to use store
   useEffect(() => {
-    onSendingStateChange(isSending)
-  }, [createChatMutation.isPending, sendMessageMutation.isPending, onSendingStateChange])
+    const isSending = createChatMutation.isPending || sendMessageMutation.isPending
+    setIsSending(isSending)
+  }, [createChatMutation.isPending, sendMessageMutation.isPending, setIsSending])
 
   return (
     <form onSubmit={handleSubmit} className="border-t p-4">
@@ -127,16 +125,20 @@ export default function ChatInputForm({ chatId, onSendingStateChange }) {
             onChange={(e) => setInput(e.target.value)}
             className="flex-1 rounded border p-2"
             placeholder="Type a message..."
-            disabled={isSending}
+            disabled={createChatMutation.isPending || sendMessageMutation.isPending}
           />
           <button
             type="submit"
             className={`rounded px-4 py-2 text-white ${
-              isSending ? 'cursor-not-allowed bg-blue-300' : 'bg-blue-500 hover:bg-blue-600'
+              createChatMutation.isPending || sendMessageMutation.isPending
+                ? 'cursor-not-allowed bg-blue-300'
+                : 'bg-blue-500 hover:bg-blue-600'
             }`}
-            disabled={isSending || !input.trim()}
+            disabled={
+              createChatMutation.isPending || sendMessageMutation.isPending || !input.trim()
+            }
           >
-            {isSending ? 'Sending...' : 'Send'}
+            {createChatMutation.isPending || sendMessageMutation.isPending ? 'Sending...' : 'Send'}
           </button>
         </div>
       </div>
