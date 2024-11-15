@@ -33,7 +33,7 @@ export default function ChatInterface() {
   })
 
   return (
-    <ScrollArea className="flex flex-1">
+    <ScrollArea className="flex flex-1" type="always">
       <div className="flex justify-center">
         <div className="flex w-full max-w-screen-md">
           {isLoading ? (

@@ -7,6 +7,7 @@ import ChatHistory from '@/components/ChatHistory'
 import UserProfile from '@/components/UserProfile'
 import ChatInputForm from '@/components/ChatInputForm'
 import ChatInterface from '@/components/ChatInterface'
+import { useRouter } from 'next/navigation'
 
 // Main Layout component
 export default function Layout({ session }) {
@@ -21,6 +22,13 @@ export default function Layout({ session }) {
     }
   }, [pathname, setCurrentChatId])
 
+  const router = useRouter()
+
+  const handleNewChat = () => {
+    setCurrentChatId(null)
+    router.push('/chat')
+  }
+
   return (
     <div className="flex h-full" style={{ backgroundColor: 'var(--global-bg)' }}>
       {/* Sidebar */}
@@ -33,11 +41,18 @@ export default function Layout({ session }) {
           <Image src="/images/logo.png" alt="Playground Logo" width={28} height={28} />
           <span className="ml-2 text-xl font-semibold">Playground</span>
         </div>
+        {/* New Chat Button */}
+        <div className="p-3">
+          <button
+            onClick={handleNewChat}
+            className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          >
+            New Chat
+          </button>
+        </div>
 
         {/* Chat History Section */}
-        <div className="flex-1 overflow-y-auto">
-          <ChatHistory />
-        </div>
+        <ChatHistory />
 
         {/* Footer - User profile */}
         <UserProfile session={session} />
