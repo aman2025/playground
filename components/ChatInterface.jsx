@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import ChatMessage from './ChatMessage'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export default function ChatInterface() {
   const { currentChatId, isSending } = useChatStore()
@@ -32,37 +33,39 @@ export default function ChatInterface() {
   })
 
   return (
-    <div className="flex flex-1 justify-center overflow-y-auto  p-4">
-      <div className="flex w-full max-w-screen-md">
-        {isLoading ? (
-          <div className="flex h-full items-center justify-center text-gray-400">
-            Loading messages...
-          </div>
-        ) : isError ? (
-          <div className="flex h-full items-center justify-center text-red-500">
-            Error: {error?.message || 'Failed to load messages'}
-          </div>
-        ) : !currentChatId ? (
-          <div className="flex h-full items-center justify-center text-gray-400">
-            Select a chat or start a new conversation
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-gray-400">Playground</div>
-        ) : (
-          <div className="w-full">
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
-              <div className="dots">
-                <span></span>
-                <span></span>
-                <span></span>
+    <ScrollArea className="flex flex-1">
+      <div className="flex justify-center">
+        <div className="flex w-full max-w-screen-md">
+          {isLoading ? (
+            <div className="flex h-full items-center justify-center text-gray-400">
+              Loading messages...
+            </div>
+          ) : isError ? (
+            <div className="flex h-full items-center justify-center text-red-500">
+              Error: {error?.message || 'Failed to load messages'}
+            </div>
+          ) : !currentChatId ? (
+            <div className="flex h-full items-center justify-center text-gray-400">
+              Select a chat or start a new conversation
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-gray-400">Playground</div>
+          ) : (
+            <div className="w-full">
+              {messages.map((message) => (
+                <ChatMessage key={message.id} message={message} />
+              ))}
+              <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
+                <div className="dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </ScrollArea>
   )
 }
