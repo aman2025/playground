@@ -22,9 +22,12 @@ export default function Layout({ session }) {
   }, [pathname, setCurrentChatId])
 
   return (
-    <div className="flex h-full">
+    <div className="flex h-full" style={{ backgroundColor: 'var(--global-bg)' }}>
       {/* Sidebar */}
-      <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
+      <aside
+        className="flex w-64 flex-col border-gray-200 bg-white"
+        style={{ backgroundColor: 'var(--global-bg)' }}
+      >
         {/* Header */}
         <div className="flex items-center p-4">
           <Image src="/images/logo.png" alt="Playground Logo" width={28} height={28} />
@@ -41,10 +44,15 @@ export default function Layout({ session }) {
       </aside>
 
       {/* Main Chat Area */}
-      <main className="flex flex-1 flex-col">
-        <ChatInterface />
-        <ChatInputForm chatId={currentChatId} />
-      </main>
+      <div className="flex h-full w-1 flex-1 flex-col p-2 pl-0">
+        <main
+          className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-white"
+          style={{ border: '1px solid var(--border-color-base)' }}
+        >
+          <ChatInterface />
+          <ChatInputForm chatId={currentChatId} />
+        </main>
+      </div>
     </div>
   )
 }
