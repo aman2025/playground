@@ -39,6 +39,9 @@ body {
     --ring: 210 50% 70%;
 
     --radius: 0.5rem;
+
+    /* custom for playground */
+    --global-bg: #f9fafb;
   }
 
   .dark {
@@ -81,7 +84,7 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
+/* todo: loading 需移到loading组件中 */
 .typing-indicator {
   display: none;
   padding: 20px;

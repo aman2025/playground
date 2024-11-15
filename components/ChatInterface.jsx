@@ -1,7 +1,6 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import ChatMessage from './ChatMessage'
-import ChatInputForm from './ChatInputForm'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 
@@ -33,38 +32,35 @@ export default function ChatInterface() {
   })
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-y-auto p-4">
-        {isLoading ? (
-          <div className="flex h-full items-center justify-center text-gray-400">
-            Loading messages...
-          </div>
-        ) : isError ? (
-          <div className="flex h-full items-center justify-center text-red-500">
-            Error: {error?.message || 'Failed to load messages'}
-          </div>
-        ) : !currentChatId ? (
-          <div className="flex h-full items-center justify-center text-gray-400">
-            Select a chat or start a new conversation
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-gray-400">Playground</div>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))}
-            <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
-              <div className="dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+    <div className="flex-1 overflow-y-auto p-4">
+      {isLoading ? (
+        <div className="flex h-full items-center justify-center text-gray-400">
+          Loading messages...
+        </div>
+      ) : isError ? (
+        <div className="flex h-full items-center justify-center text-red-500">
+          Error: {error?.message || 'Failed to load messages'}
+        </div>
+      ) : !currentChatId ? (
+        <div className="flex h-full items-center justify-center text-gray-400">
+          Select a chat or start a new conversation
+        </div>
+      ) : messages.length === 0 ? (
+        <div className="flex h-full items-center justify-center text-gray-400">Playground</div>
+      ) : (
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <ChatMessage key={message.id} message={message} />
+          ))}
+          <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
+            <div className="dots">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
           </div>
-        )}
-      </div>
-      <ChatInputForm chatId={currentChatId} />
+        </div>
+      )}
     </div>
   )
 }
