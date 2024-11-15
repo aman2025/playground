@@ -32,35 +32,37 @@ export default function ChatInterface() {
   })
 
   return (
-    <div className="flex-1 overflow-y-auto p-4">
-      {isLoading ? (
-        <div className="flex h-full items-center justify-center text-gray-400">
-          Loading messages...
-        </div>
-      ) : isError ? (
-        <div className="flex h-full items-center justify-center text-red-500">
-          Error: {error?.message || 'Failed to load messages'}
-        </div>
-      ) : !currentChatId ? (
-        <div className="flex h-full items-center justify-center text-gray-400">
-          Select a chat or start a new conversation
-        </div>
-      ) : messages.length === 0 ? (
-        <div className="flex h-full items-center justify-center text-gray-400">Playground</div>
-      ) : (
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
-          <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
-            <div className="dots">
-              <span></span>
-              <span></span>
-              <span></span>
+    <div className="flex flex-1 justify-center overflow-y-auto  p-4">
+      <div className="flex w-full max-w-screen-md">
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center text-gray-400">
+            Loading messages...
+          </div>
+        ) : isError ? (
+          <div className="flex h-full items-center justify-center text-red-500">
+            Error: {error?.message || 'Failed to load messages'}
+          </div>
+        ) : !currentChatId ? (
+          <div className="flex h-full items-center justify-center text-gray-400">
+            Select a chat or start a new conversation
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-gray-400">Playground</div>
+        ) : (
+          <div className="w-full">
+            {messages.map((message) => (
+              <ChatMessage key={message.id} message={message} />
+            ))}
+            <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
+              <div className="dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

@@ -108,40 +108,44 @@ export default function ChatInputForm({ chatId }) {
   }, [createChatMutation.isPending, sendMessageMutation.isPending, setIsSending])
 
   return (
-    <form onSubmit={handleSubmit} className="border-t p-4">
-      <div className="flex flex-col gap-2">
-        <div className="flex gap-2">
-          <input type="file" ref={fileInputRef} accept="image/*" className="hidden" />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="rounded bg-gray-200 p-2"
-          >
-            📎
-          </button>
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-1 rounded border p-2"
-            placeholder="Type a message..."
-            disabled={createChatMutation.isPending || sendMessageMutation.isPending}
-          />
-          <button
-            type="submit"
-            className={`rounded px-4 py-2 text-white ${
-              createChatMutation.isPending || sendMessageMutation.isPending
-                ? 'cursor-not-allowed bg-blue-300'
-                : 'bg-blue-500 hover:bg-blue-600'
-            }`}
-            disabled={
-              createChatMutation.isPending || sendMessageMutation.isPending || !input.trim()
-            }
-          >
-            {createChatMutation.isPending || sendMessageMutation.isPending ? 'Sending...' : 'Send'}
-          </button>
+    <div className="flex justify-center bg-white">
+      <form onSubmit={handleSubmit} className="flex w-full max-w-screen-md bg-gray-100 pb-4 pt-4">
+        <div className="flex w-full flex-col gap-2">
+          <div className="flex gap-2">
+            <input type="file" ref={fileInputRef} accept="image/*" className="hidden" />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded bg-gray-200 p-2"
+            >
+              📎
+            </button>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-1 rounded border p-2"
+              placeholder="Type a message..."
+              disabled={createChatMutation.isPending || sendMessageMutation.isPending}
+            />
+            <button
+              type="submit"
+              className={`rounded px-4 py-2 text-white ${
+                createChatMutation.isPending || sendMessageMutation.isPending
+                  ? 'cursor-not-allowed bg-blue-300'
+                  : 'bg-blue-500 hover:bg-blue-600'
+              }`}
+              disabled={
+                createChatMutation.isPending || sendMessageMutation.isPending || !input.trim()
+              }
+            >
+              {createChatMutation.isPending || sendMessageMutation.isPending
+                ? 'Sending...'
+                : 'Send'}
+            </button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }

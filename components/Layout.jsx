@@ -44,15 +44,15 @@ export default function Layout({ session }) {
       </aside>
 
       {/* Main Chat Area */}
-      <div className="flex h-full w-1 flex-1 flex-col p-2 pl-0">
-        <main
+      <main className="flex h-full w-1 flex-1 flex-col p-2 pl-0">
+        <div
           className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-white"
           style={{ border: '1px solid var(--border-color-base)' }}
         >
           <ChatInterface />
           <ChatInputForm chatId={currentChatId} />
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }
