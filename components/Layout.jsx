@@ -8,6 +8,7 @@ import UserProfile from '@/components/UserProfile'
 import ChatInputForm from '@/components/ChatInputForm'
 import ChatInterface from '@/components/ChatInterface'
 import { useRouter } from 'next/navigation'
+import { Plus } from 'lucide-react'
 
 // Main Layout component
 export default function Layout({ session }) {
@@ -45,8 +46,9 @@ export default function Layout({ session }) {
         <div className="p-3">
           <button
             onClick={handleNewChat}
-            className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-500 bg-white p-1 text-sm text-blue-500"
           >
+            <Plus size={16} />
             New Chat
           </button>
         </div>
