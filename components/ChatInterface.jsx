@@ -1,12 +1,15 @@
 'use client'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import ChatMessage from './ChatMessage'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useState } from 'react'
 
 export default function ChatInterface() {
-  const { currentChatId, isSending } = useChatStore()
+  const queryClient = useQueryClient()
+  const { currentChatId, isSending, setIsSending } = useChatStore()
+  const [streamingMessage, setStreamingMessage] = useState('')
 
   // Fetch messages using React Query
   const {
@@ -32,6 +35,44 @@ export default function ChatInterface() {
     },
   })
 
+  // Add this function to handle streaming responses
+  const handleStreamingResponse = async (response) => {
+    setIsSending(true)
+    setStreamingMessage('')
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n').filter((line) => line.trim())
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6))
+              if (data.content) {
+                setStreamingMessage((prev) => prev + data.content)
+              }
+            } catch (e) {
+              console.error('Error parsing SSE message:', e)
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error reading stream:', error)
+    } finally {
+      setIsSending(false)
+      // Invalidate the messages query to fetch the complete message
+      queryClient.invalidateQueries(['messages', currentChatId])
+    }
+  }
+
   return (
     <ScrollArea className="flex flex-1" type="always">
       <div className="flex justify-center">
@@ -55,6 +96,15 @@ export default function ChatInterface() {
               {messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
+              {streamingMessage && (
+                <ChatMessage
+                  message={{
+                    id: 'streaming',
+                    content: streamingMessage,
+                    role: 'assistant',
+                  }}
+                />
+              )}
               <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
                 <div className="dots">
                   <span></span>

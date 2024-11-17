@@ -71,7 +71,7 @@ export async function POST(request, { params }) {
         agent_id: process.env.AGENT_ID,
         messages,
         max_tokens: 1000,
-        stream: false,
+        stream: true,
       }),
     })
 
@@ -79,17 +79,71 @@ export async function POST(request, { params }) {
       throw new Error(`Mistral API error: ${mistralResponse.statusText}`)
     }
 
-    const mistralData = await mistralResponse.json()
+    // Create a streaming response
+    return new Response(
+      new ReadableStream({
+        async start(controller) {
+          const reader = mistralResponse.body.getReader()
+          const decoder = new TextDecoder()
+          let accumulatedContent = ''
 
-    const assistantContent = mistralData.choices[0].message.content
-    // Save assistant message
-    const assistantMessage = await prisma.message.create({
-      data: {
-        content: assistantContent,
-        role: 'assistant',
-        chatId: params.chatId,
-      },
-    })
+          try {
+            while (true) {
+              const { done, value } = await reader.read()
+
+              // Check if stream is done before processing
+              if (done) {
+                // Save the complete message to the database before closing
+                await prisma.message.create({
+                  data: {
+                    content: accumulatedContent,
+                    role: 'assistant',
+                    chatId: params.chatId,
+                  },
+                })
+                controller.close()
+                break
+              }
+
+              // Decode the chunk and split into lines
+              const chunk = decoder.decode(value)
+              const lines = chunk.split('\n').filter((line) => line.trim())
+
+              for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                  const jsonString = line.slice(6) // Remove 'data: ' prefix
+                  if (jsonString === '[DONE]') continue
+
+                  try {
+                    const jsonData = JSON.parse(jsonString)
+                    // Extract the content from the response
+                    const content = jsonData.choices[0]?.delta?.content || ''
+                    if (content) {
+                      accumulatedContent += content
+                      // Encode the content as an SSE event
+                      const sseMessage = `data: ${JSON.stringify({ content })}\n\n`
+                      controller.enqueue(new TextEncoder().encode(sseMessage))
+                    }
+                  } catch (e) {
+                    console.error('Error parsing JSON:', e)
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Stream processing error:', error)
+            controller.error(error)
+          }
+        },
+      }),
+      {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        },
+      }
+    )
 
     // Update chat title if it's the first message
     if (chatHistory.length === 0) {

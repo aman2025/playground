@@ -126,3 +126,43 @@ body {
     transform: translateY(-4px);
   }
 }
+
+.typing-indicator {
+  display: none;
+  padding: 15px;
+}
+
+.typing-indicator.active {
+  display: block;
+}
+
+.typing-indicator .dots {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-indicator .dots span {
+  width: 8px;
+  height: 8px;
+  background-color: #8e8ea0;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.typing-indicator .dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-indicator .dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
