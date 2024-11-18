@@ -84,8 +84,30 @@ export default function ChatInputForm({ chatId }) {
         setIsSending(false)
       }
     },
+    onMutate: async ({ chatId, formData }) => {
+      // Cancel any outgoing refetches to avoid overwriting our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['messages', chatId] })
+
+      // Snapshot the previous value
+      const previousMessages = queryClient.getQueryData(['messages', chatId])
+
+      // Optimistically update the messages cache
+      const optimisticMessage = {
+        id: 'temp-' + Date.now(), // Temporary ID
+        content: formData.get('content'),
+        role: 'user',
+        image: formData.get('image') ? URL.createObjectURL(formData.get('image')) : null,
+        createdAt: new Date().toISOString(),
+      }
+      // add user message
+      queryClient.setQueryData(['messages', chatId], (old) => [...(old || []), optimisticMessage])
+
+      // Return a context object with the snapshot
+      return { previousMessages }
+    },
     onError: (err, newMessage, context) => {
-      // If the mutation fails, roll back to the previous state
+      // todo: not previousMessages data
+      // Snapshot the previous value
       queryClient.setQueryData(['messages', chatId], context?.previousMessages)
     },
     onSuccess: (newMessage, { chatId }) => {
@@ -112,7 +134,7 @@ export default function ChatInputForm({ chatId }) {
         const newChat = await createChatMutation.mutateAsync(input.trim())
         queryClient.invalidateQueries({ queryKey: ['chats'] })
 
-        // Don't await this call
+        // Don't await this call, don't use await
         sendMessageMutation.mutate({
           chatId: newChat.id,
           formData,
