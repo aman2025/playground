@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { chatApi } from '../services/api'
 import { useChatStore } from '../store/chatStore'
+import { Send, Square } from 'lucide-react'
 
 // ChatInputForm component handles message input and file attachment
 export default function ChatInputForm({ chatId }) {
@@ -177,18 +178,17 @@ export default function ChatInputForm({ chatId }) {
             />
             <button
               type="submit"
-              className={`rounded px-4 py-2 text-white ${
+              className={`rounded-[8px] px-3 py-2 text-white ${
                 createChatMutation.isPending || sendMessageMutation.isPending
                   ? 'cursor-not-allowed bg-blue-300'
                   : 'bg-blue-500 hover:bg-blue-600'
               }`}
-              disabled={
-                createChatMutation.isPending || sendMessageMutation.isPending || !input.trim()
-              }
             >
-              {createChatMutation.isPending || sendMessageMutation.isPending
-                ? 'Sending...'
-                : 'Send'}
+              {createChatMutation.isPending || sendMessageMutation.isPending ? (
+                <Square className="h-5 w-5" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>
