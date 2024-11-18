@@ -9,7 +9,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 // Component to display chat history in sidebar
 export default function ChatHistory() {
-  console.log('ChatHistory')
   const { setCurrentChatId, currentChatId } = useChatStore()
 
   // Add queryClient for cache management

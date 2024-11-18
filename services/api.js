@@ -25,14 +25,18 @@ export const chatApi = {
   // Create a new chat
   createChat: (title) => api.post('/chats', { title }),
 
-  // Send message to a chat
-  sendMessage: async (chatId, formData) => {
-    const response = await api.post(`/chat/${chatId}/messages`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+  // Send message to a chat, Modify sendMessage to return the raw response without reading it, don't use axios.post
+  async sendMessage(chatId, formData) {
+    const response = await fetch(`/api/chat/${chatId}/messages`, {
+      method: 'POST',
+      body: formData,
     })
-    return response || []
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok')
+    }
+
+    return response // Return the raw response instead of calling .json()
   },
 
   // Get messages for a chat

@@ -6,7 +6,6 @@ import { useChatStore } from '../store/chatStore'
 
 // ChatInputForm component handles message input and file attachment
 export default function ChatInputForm({ chatId }) {
-  console.log('ChatInputForm')
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
@@ -28,34 +27,66 @@ export default function ChatInputForm({ chatId }) {
   // Mutation for sending a message
   const sendMessageMutation = useMutation({
     mutationFn: async ({ chatId, formData }) => {
-      const response = await chatApi.sendMessage(chatId, formData)
-      return response
-    },
-    onMutate: async ({ chatId, formData }) => {
-      // Cancel any outgoing refetches to avoid overwriting our optimistic update
-      await queryClient.cancelQueries({ queryKey: ['messages', chatId] })
+      setIsSending(true)
 
-      // Snapshot the previous value
-      const previousMessages = queryClient.getQueryData(['messages', chatId])
+      try {
+        const response = await chatApi.sendMessage(chatId, formData)
+        const reader = response.body.getReader()
+        const decoder = new TextDecoder()
 
-      // Optimistically update the messages cache
-      const optimisticMessage = {
-        id: 'temp-' + Date.now(), // Temporary ID
-        content: formData.get('content'),
-        role: 'user',
-        image: formData.get('image') ? URL.createObjectURL(formData.get('image')) : null,
-        createdAt: new Date().toISOString(),
-        // Add any other required message properties
+        let fullResponse = ''
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value)
+
+          // Process SSE data
+          const lines = chunk.split('\n').filter((line) => line.trim())
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const jsonData = JSON.parse(line.slice(6))
+
+                // Update immediately without waiting
+                fullResponse += jsonData.content
+                queryClient.setQueryData(['messages', chatId], (old) => {
+                  const messages = [...(old || [])]
+                  const lastMessage = messages[messages.length - 1]
+
+                  if (lastMessage?.role === 'assistant' && lastMessage.id === 'temp-assistant') {
+                    // Update existing assistant message
+                    return messages.map((msg) =>
+                      msg.id === 'temp-assistant' ? { ...msg, content: fullResponse } : msg
+                    )
+                  } else {
+                    // Add new assistant message
+                    return [
+                      ...messages,
+                      {
+                        id: 'temp-assistant',
+                        content: fullResponse,
+                        role: 'assistant',
+                        createdAt: new Date().toISOString(),
+                      },
+                    ]
+                  }
+                })
+              } catch (e) {
+                console.error('Error parsing SSE data:', e)
+              }
+            }
+          }
+        }
+        return fullResponse
+      } finally {
+        setIsSending(false)
       }
-
-      queryClient.setQueryData(['messages', chatId], (old) => [...(old || []), optimisticMessage])
-
-      // Return a context object with the snapshot
-      return { previousMessages }
     },
     onError: (err, newMessage, context) => {
       // If the mutation fails, roll back to the previous state
-      queryClient.setQueryData(['messages', chatId], context.previousMessages)
+      queryClient.setQueryData(['messages', chatId], context?.previousMessages)
     },
     onSuccess: (newMessage, { chatId }) => {
       // Invalidate and refetch
@@ -70,42 +101,36 @@ export default function ChatInputForm({ chatId }) {
     e.preventDefault()
     if (!input.trim()) return
 
-    try {
-      const formData = new FormData()
-      formData.append('content', input)
-      if (fileInputRef.current?.files?.[0]) {
-        formData.append('image', fileInputRef.current.files[0])
-      }
+    const formData = new FormData()
+    formData.append('content', input)
+    if (fileInputRef.current?.files?.[0]) {
+      formData.append('image', fileInputRef.current.files[0])
+    }
 
+    try {
       if (!chatId) {
-        // Wait for chat creation before sending message
         const newChat = await createChatMutation.mutateAsync(input.trim())
-        // Invalidate chats query, update the chat list
         queryClient.invalidateQueries({ queryKey: ['chats'] })
 
-        // Wait for message to be sent
-        await sendMessageMutation.mutateAsync({
+        // Don't await this call
+        sendMessageMutation.mutate({
           chatId: newChat.id,
           formData,
         })
       } else {
-        await sendMessageMutation.mutateAsync({ chatId, formData })
+        // Don't await this call
+        sendMessageMutation.mutate({ chatId, formData })
       }
-    } catch (error) {
-      console.error('Error:', error)
-    } finally {
+
+      // Clear input immediately after sending
       setInput('')
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
+    } catch (error) {
+      console.error('Error:', error)
     }
   }
-
-  // Update useEffect to use store
-  useEffect(() => {
-    const isSending = createChatMutation.isPending || sendMessageMutation.isPending
-    setIsSending(isSending)
-  }, [createChatMutation.isPending, sendMessageMutation.isPending, setIsSending])
 
   return (
     <div className="flex justify-center bg-white">
