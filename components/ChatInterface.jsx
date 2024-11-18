@@ -4,7 +4,7 @@ import ChatMessage from './ChatMessage'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 import { ScrollArea } from '@/components/ui/scroll-area'
-
+import Loading from '@/components/Loading'
 export default function ChatInterface({ session }) {
   const { currentChatId, isSending } = useChatStore()
 
@@ -55,13 +55,7 @@ export default function ChatInterface({ session }) {
               {messages.map((message) => (
                 <ChatMessage key={message.id} message={message} session={session} />
               ))}
-              <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
-                <div className="dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
+              <Loading className="mt-4" />
             </div>
           )}
         </div>
