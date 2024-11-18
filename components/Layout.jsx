@@ -66,7 +66,7 @@ export default function Layout({ session }) {
           className="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-white"
           style={{ border: '1px solid var(--border-color-base)' }}
         >
-          <ChatInterface />
+          <ChatInterface session={session} />
           <ChatInputForm chatId={currentChatId} />
         </div>
       </main>

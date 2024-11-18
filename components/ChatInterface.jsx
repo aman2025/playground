@@ -5,7 +5,7 @@ import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
-export default function ChatInterface() {
+export default function ChatInterface({ session }) {
   const { currentChatId, isSending } = useChatStore()
 
   // Fetch messages using React Query
@@ -35,7 +35,7 @@ export default function ChatInterface() {
   return (
     <ScrollArea className="flex flex-1" type="always">
       <div className="flex justify-center">
-        <div className="flex w-full max-w-screen-md">
+        <div className="flex w-full max-w-[818px]">
           {isLoading ? (
             <div className="flex h-full items-center justify-center text-gray-400">
               Loading messages...
@@ -53,7 +53,7 @@ export default function ChatInterface() {
           ) : (
             <div className="w-full">
               {messages.map((message) => (
-                <ChatMessage key={message.id} message={message} />
+                <ChatMessage key={message.id} message={message} session={session} />
               ))}
               <div className={`typing-indicator ${isSending ? 'active' : ''}`}>
                 <div className="dots">
