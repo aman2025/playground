@@ -1,5 +1,6 @@
 // Component to display individual chat messages with avatars
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import ReactMarkdown from 'react-markdown'
 
 export default function ChatMessage({ message, session }) {
   return (
@@ -26,7 +27,9 @@ export default function ChatMessage({ message, session }) {
         {message.imageUrl && (
           <img src={message.imageUrl} alt="Uploaded content" className="mb-2 max-w-sm rounded" />
         )}
-        <p>{message.content}</p>
+        <div className="prose prose-sm max-w-none">
+          <ReactMarkdown>{message.content}</ReactMarkdown>
+        </div>
       </div>
     </div>
   )
