@@ -5,11 +5,12 @@ import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Loading from '@/components/Loading'
+import { useRef, useState, useEffect } from 'react'
 
 export default function ChatInterface({ session }) {
   const { currentChatId, isSending } = useChatStore()
 
-  // Fetch messages using React Query
+  // Fetch messages using React Query first
   const {
     data: messages = [],
     isLoading,
@@ -21,9 +22,7 @@ export default function ChatInterface({ session }) {
     enabled: !!currentChatId,
     staleTime: 1000 * 60,
     refetchOnWindowFocus: false,
-    // Add retry logic
     retry: 3,
-    // Add error handler
     onError: (error) => {
       console.error('Error fetching messages:', error)
     },
@@ -38,32 +37,77 @@ export default function ChatInterface({ session }) {
     },
   })
 
+  // Add refs and state for scroll management
+  const scrollAreaRef = useRef(null)
+  const [userScrolled, setUserScrolled] = useState(false)
+
+  // Update scroll handler to use Radix UI's viewport
+  const handleScroll = (event) => {
+    // Get the viewport element directly
+    const viewport = event.currentTarget
+    const { scrollTop, scrollHeight, clientHeight } = viewport
+    const isAtBottom = Math.abs(scrollHeight - clientHeight - scrollTop) < 10
+
+    if (!isAtBottom) {
+      setUserScrolled(true)
+    } else {
+      setUserScrolled(false)
+    }
+  }
+
+  // Add scroll event listener to viewport
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
+      if (viewport) {
+        viewport.addEventListener('scroll', handleScroll)
+        return () => viewport.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, []) // Empty dependency array since we only want to attach/detach the listener once
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!userScrolled && scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      )
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight
+      }
+    }
+  }, [messages, isSending, userScrolled])
+
   return (
-    <ScrollArea className="flex flex-1" type="always">
-      <div className="flex justify-center">
-        <div className="flex w-full max-w-[818px]">
-          {isLoading ? (
-            <div className="flex h-full items-center justify-center text-gray-400">
-              Loading messages...
-            </div>
-          ) : isError ? (
-            <div className="flex h-full items-center justify-center text-red-500">
-              Error: {error?.message || 'Failed to load messages'}
-            </div>
-          ) : !currentChatId ? (
-            <div className="flex h-full items-center justify-center text-gray-400">
-              Select a chat or start a new conversation
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-gray-400">Playground</div>
-          ) : (
-            <div className="w-full">
-              {messages.map((message) => (
-                <ChatMessage key={message.id} message={message} session={session} />
-              ))}
-              {isSending && <Loading className="mt-4" />}
-            </div>
-          )}
+    <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
+      <div className="h-full w-full" data-radix-scroll-area-viewport="">
+        <div className="flex justify-center">
+          <div className="flex w-full max-w-[818px]">
+            {isLoading ? (
+              <div className="flex h-full items-center justify-center text-gray-400">
+                Loading messages...
+              </div>
+            ) : isError ? (
+              <div className="flex h-full items-center justify-center text-red-500">
+                Error: {error?.message || 'Failed to load messages'}
+              </div>
+            ) : !currentChatId ? (
+              <div className="flex h-full items-center justify-center text-gray-400">
+                Select a chat or start a new conversation
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex h-full items-center justify-center text-gray-400">
+                Playground
+              </div>
+            ) : (
+              <div className="w-full">
+                {messages.map((message) => (
+                  <ChatMessage key={message.id} message={message} session={session} />
+                ))}
+                {isSending && <Loading className="mt-4" />}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </ScrollArea>
