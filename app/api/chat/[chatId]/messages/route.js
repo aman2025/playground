@@ -6,8 +6,9 @@ import { streamControllers } from '@/app/api/chat/streamControllers'
 
 export async function POST(request, { params }) {
   const controller = new AbortController()
+  // Add the AbortController to the streamControllers map with the chatId as the key
+  // This allows us to manage and abort the stream associated with this chatId if needed
   streamControllers.set(params.chatId, controller)
-  console.log('Added controller for chatId:', params.chatId)
 
   try {
     // Get the authenticated user's session
@@ -109,8 +110,6 @@ export async function POST(request, { params }) {
           try {
             // Add abort handler
             controller.signal.addEventListener('abort', async () => {
-              console.log('Abort triggered for chatId:', params.chatId)
-
               try {
                 // Save the partial message
                 if (accumulatedContent.trim()) {
@@ -138,7 +137,6 @@ export async function POST(request, { params }) {
 
             while (true) {
               if (controller.signal.aborted) {
-                console.log('Stream aborted, breaking loop')
                 break
               }
 
@@ -181,14 +179,12 @@ export async function POST(request, { params }) {
                 }
               } catch (error) {
                 if (error.name === 'AbortError') {
-                  console.log('Read operation aborted')
                   break
                 }
                 throw error
               }
             }
           } catch (error) {
-            console.log('Stream error:', error)
             if (error.name !== 'AbortError') {
               streamController.error(error)
             }

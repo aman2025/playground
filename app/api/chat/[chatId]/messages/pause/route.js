@@ -4,21 +4,19 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { streamControllers } from '@/app/api/chat/streamControllers'
 
 export async function POST(request, { params }) {
-  console.log('Current active streams:', Array.from(streamControllers.keys()))
-
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Retrieve the AbortController for the given chatId from the streamControllers map
     const controller = streamControllers.get(params.chatId)
-    console.log('Found controller for chatId:', params.chatId, !!controller)
 
+    // If a controller is found, abort the stream and remove the controller from the map
     if (controller) {
       controller.abort()
       streamControllers.delete(params.chatId)
-      console.log('Controller aborted for chatId:', params.chatId)
     }
 
     return NextResponse.json({ success: true })
