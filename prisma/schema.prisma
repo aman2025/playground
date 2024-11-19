@@ -45,6 +45,7 @@ model Message {
   id        String   @id @default(cuid())
   content   String   @db.Text
   role      String   // 'user' or 'assistant'
+  status    String   @default("completed")
   chatId    String
   imageUrl  String?  // Optional field for image messages
   createdAt DateTime @default(now())

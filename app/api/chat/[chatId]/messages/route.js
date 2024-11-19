@@ -2,8 +2,15 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { streamControllers } from '@/app/api/chat/streamControllers'
 
 export async function POST(request, { params }) {
+  // Create and store controller
+  const controller = new AbortController()
+  streamControllers.set(params.chatId, controller)
+  console.log('Added controller for chatId:', params.chatId)
+  console.log('Active streams after adding:', Array.from(streamControllers.keys()))
+
   try {
     // Get the authenticated user's session
     const session = await getServerSession(authOptions)
@@ -73,6 +80,7 @@ export async function POST(request, { params }) {
         max_tokens: 1000,
         stream: true,
       }),
+      signal: controller.signal,
     })
 
     if (!mistralResponse.ok) {
@@ -82,47 +90,67 @@ export async function POST(request, { params }) {
     // Create a streaming response
     return new Response(
       new ReadableStream({
-        async start(controller) {
+        async start(streamController) {
           const reader = mistralResponse.body.getReader()
           const decoder = new TextDecoder()
           let accumulatedContent = ''
 
           try {
-            while (true) {
-              const { done, value } = await reader.read()
+            // Add abort handler
+            controller.signal.addEventListener('abort', async () => {
+              console.log('Abort triggered for chatId:', params.chatId)
 
-              // Check if stream is done before processing
-              if (done) {
-                // Save the complete message to the database before closing
+              // Save the partial message without status field
+              if (accumulatedContent.trim()) {
                 await prisma.message.create({
                   data: {
-                    content: accumulatedContent,
+                    content: accumulatedContent + ' [paused]',
                     role: 'assistant',
                     chatId: params.chatId,
                   },
                 })
-                controller.close()
+              }
+
+              reader.cancel()
+              streamController.close()
+            })
+
+            while (true) {
+              if (controller.signal.aborted) {
+                console.log('Stream aborted, breaking loop')
                 break
               }
 
-              // Decode the chunk and split into lines
+              const { done, value } = await reader.read()
+              if (done) {
+                // Save complete message if not aborted
+                if (!controller.signal.aborted && accumulatedContent.trim()) {
+                  await prisma.message.create({
+                    data: {
+                      content: accumulatedContent,
+                      role: 'assistant',
+                      chatId: params.chatId,
+                    },
+                  })
+                }
+                break
+              }
+
               const chunk = decoder.decode(value)
               const lines = chunk.split('\n').filter((line) => line.trim())
 
               for (const line of lines) {
                 if (line.startsWith('data: ')) {
-                  const jsonString = line.slice(6) // Remove 'data: ' prefix
+                  const jsonString = line.slice(6)
                   if (jsonString === '[DONE]') continue
 
                   try {
                     const jsonData = JSON.parse(jsonString)
-                    // Extract the content from the response
                     const content = jsonData.choices[0]?.delta?.content || ''
                     if (content) {
                       accumulatedContent += content
-                      // Encode the content as an SSE event
                       const sseMessage = `data: ${JSON.stringify({ content })}\n\n`
-                      controller.enqueue(new TextEncoder().encode(sseMessage))
+                      streamController.enqueue(new TextEncoder().encode(sseMessage))
                     }
                   } catch (e) {
                     console.error('Error parsing JSON:', e)
@@ -131,8 +159,16 @@ export async function POST(request, { params }) {
               }
             }
           } catch (error) {
-            console.error('Stream processing error:', error)
-            controller.error(error)
+            console.log('Stream error:', error)
+            if (controller.signal.aborted) {
+              console.log('Stream was aborted')
+              streamController.close()
+            } else {
+              streamController.error(error)
+            }
+          } finally {
+            console.log('Stream finished or aborted for chatId:', params.chatId)
+            streamControllers.delete(params.chatId)
           }
         },
       }),
@@ -155,7 +191,8 @@ export async function POST(request, { params }) {
 
     return NextResponse.json([assistantMessage])
   } catch (error) {
-    console.error('Error processing message:', error)
+    console.error('Error in messages route:', error)
+    streamControllers.delete(params.chatId)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

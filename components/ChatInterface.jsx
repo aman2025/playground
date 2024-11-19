@@ -5,6 +5,7 @@ import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Loading from '@/components/Loading'
+
 export default function ChatInterface({ session }) {
   const { currentChatId, isSending } = useChatStore()
 
@@ -26,9 +27,14 @@ export default function ChatInterface({ session }) {
     onError: (error) => {
       console.error('Error fetching messages:', error)
     },
-    // Transform the response data
+    // Transform the response data to handle message status
     select: (data) => {
-      return Array.isArray(data) ? data : []
+      if (!Array.isArray(data)) return []
+      return data.map((message) => ({
+        ...message,
+        // Add visual indicator for paused messages
+        isPaused: message.status === 'paused',
+      }))
     },
   })
 
@@ -55,7 +61,7 @@ export default function ChatInterface({ session }) {
               {messages.map((message) => (
                 <ChatMessage key={message.id} message={message} session={session} />
               ))}
-              <Loading className="mt-4" />
+              {isSending && <Loading className="mt-4" />}
             </div>
           )}
         </div>

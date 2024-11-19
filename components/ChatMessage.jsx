@@ -3,6 +3,12 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import ReactMarkdown from 'react-markdown'
 
 export default function ChatMessage({ message, session }) {
+  // Check if message was paused by looking for the [paused] marker
+  const isPaused = message.content.endsWith('[paused]')
+
+  // Remove the [paused] marker from displayed content
+  const displayContent = isPaused ? message.content.replace('[paused]', '') : message.content
+
   return (
     <div
       className={`mb-8 flex items-start gap-2 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
@@ -22,13 +28,18 @@ export default function ChatMessage({ message, session }) {
 
       {/* Message content */}
       <div
-        className={`rounded-[20px] ${message.role === 'user' ? 'max-w-[80%] bg-gray-100 px-4 py-2 ' : 'bg-white px-2'}`}
+        className={`rounded-[20px] ${
+          message.role === 'user'
+            ? 'max-w-[80%] bg-gray-100 px-4 py-2'
+            : `bg-white px-2 ${isPaused ? 'border-l-4 border-amber-400' : ''}`
+        }`}
       >
         {message.imageUrl && (
           <img src={message.imageUrl} alt="Uploaded content" className="mb-2 max-w-sm rounded" />
         )}
         <div className="prose prose-sm max-w-none">
-          <ReactMarkdown>{message.content}</ReactMarkdown>
+          <ReactMarkdown>{displayContent}</ReactMarkdown>
+          {isPaused && <span className="ml-2 text-xs italic text-amber-600">(Message paused)</span>}
         </div>
       </div>
     </div>

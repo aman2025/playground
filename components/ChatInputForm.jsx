@@ -11,6 +11,7 @@ export default function ChatInputForm({ chatId }) {
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
   const { setCurrentChatId, setIsSending } = useChatStore()
+  const [isCancelling, setIsCancelling] = useState(false)
 
   // Mutation for creating a new chat
   const createChatMutation = useMutation({
@@ -155,6 +156,27 @@ export default function ChatInputForm({ chatId }) {
     }
   }
 
+  // Update the cancel handler
+  const handleCancelStream = async () => {
+    if (!chatId || isCancelling) return
+
+    try {
+      setIsCancelling(true)
+      await chatApi.pauseMessage(chatId)
+
+      // Invalidate the messages query to ensure UI is updated
+      queryClient.invalidateQueries({
+        queryKey: ['messages', chatId],
+        exact: true,
+      })
+    } catch (error) {
+      console.error('Error cancelling stream:', error)
+    } finally {
+      setIsCancelling(false)
+      setIsSending(false) // Reset sending state
+    }
+  }
+
   return (
     <div className="flex justify-center bg-white">
       <form onSubmit={handleSubmit} className="flex w-full max-w-screen-md bg-gray-100 pb-4 pt-4">
@@ -174,17 +196,18 @@ export default function ChatInputForm({ chatId }) {
               onChange={(e) => setInput(e.target.value)}
               className="flex-1 rounded border p-2"
               placeholder="Type a message..."
-              disabled={createChatMutation.isPending || sendMessageMutation.isPending}
             />
             <button
-              type="submit"
+              type="button"
+              onClick={handleCancelStream}
+              disabled={isCancelling}
               className={`rounded-[8px] px-3 py-2 text-white ${
                 createChatMutation.isPending || sendMessageMutation.isPending
-                  ? 'cursor-not-allowed bg-blue-300'
+                  ? 'cursor-pointer bg-blue-300'
                   : 'bg-blue-500 hover:bg-blue-600'
-              }`}
+              } ${isCancelling ? 'opacity-50' : ''}`}
             >
-              {createChatMutation.isPending || sendMessageMutation.isPending ? (
+              {(createChatMutation.isPending || sendMessageMutation.isPending) && !isCancelling ? (
                 <Square className="h-5 w-5" />
               ) : (
                 <Send className="h-5 w-5" />

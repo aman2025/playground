@@ -17,7 +17,7 @@ api.interceptors.response.use(
   }
 )
 
-// Chat related API calls
+// Chat related API calls, for react-query
 export const chatApi = {
   // Get all chats with message count
   getAllChats: () => api.get('/chats', { params: { include_message_count: true } }),
@@ -56,6 +56,17 @@ export const chatApi = {
     })
     if (!response.ok) {
       throw new Error('Failed to delete chat')
+    }
+    return response.json()
+  },
+
+  // Add pause message method
+  pauseMessage: async (chatId) => {
+    const response = await fetch(`/api/chat/${chatId}/messages/pause`, {
+      method: 'POST',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to pause message stream')
     }
     return response.json()
   },
