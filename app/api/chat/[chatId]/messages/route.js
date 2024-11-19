@@ -5,11 +5,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { streamControllers } from '@/app/api/chat/streamControllers'
 
 export async function POST(request, { params }) {
-  // Create and store controller
   const controller = new AbortController()
   streamControllers.set(params.chatId, controller)
   console.log('Added controller for chatId:', params.chatId)
-  console.log('Active streams after adding:', Array.from(streamControllers.keys()))
 
   try {
     // Get the authenticated user's session
@@ -94,25 +92,48 @@ export async function POST(request, { params }) {
           const reader = mistralResponse.body.getReader()
           const decoder = new TextDecoder()
           let accumulatedContent = ''
+          let isStreamClosed = false
+
+          const cleanup = async () => {
+            try {
+              if (!isStreamClosed) {
+                isStreamClosed = true
+                streamController.close()
+              }
+              streamControllers.delete(params.chatId)
+            } catch (error) {
+              console.error('Cleanup error:', error)
+            }
+          }
 
           try {
             // Add abort handler
             controller.signal.addEventListener('abort', async () => {
               console.log('Abort triggered for chatId:', params.chatId)
 
-              // Save the partial message without status field
-              if (accumulatedContent.trim()) {
-                await prisma.message.create({
-                  data: {
-                    content: accumulatedContent + ' [paused]',
-                    role: 'assistant',
-                    chatId: params.chatId,
-                  },
-                })
+              try {
+                // Save the partial message
+                if (accumulatedContent.trim()) {
+                  await prisma.message.create({
+                    data: {
+                      content: accumulatedContent + ' [paused]',
+                      role: 'assistant',
+                      chatId: params.chatId,
+                    },
+                  })
+                }
+              } catch (error) {
+                console.error('Error saving partial message:', error)
               }
 
-              reader.cancel()
-              streamController.close()
+              try {
+                await reader.cancel()
+                await cleanup()
+              } catch (error) {
+                if (error.name !== 'AbortError') {
+                  console.error('Error during abort cleanup:', error)
+                }
+              }
             })
 
             while (true) {
@@ -121,54 +142,58 @@ export async function POST(request, { params }) {
                 break
               }
 
-              const { done, value } = await reader.read()
-              if (done) {
-                // Save complete message if not aborted
-                if (!controller.signal.aborted && accumulatedContent.trim()) {
-                  await prisma.message.create({
-                    data: {
-                      content: accumulatedContent,
-                      role: 'assistant',
-                      chatId: params.chatId,
-                    },
-                  })
+              try {
+                const { done, value } = await reader.read()
+                if (done) {
+                  if (!controller.signal.aborted && accumulatedContent.trim()) {
+                    await prisma.message.create({
+                      data: {
+                        content: accumulatedContent,
+                        role: 'assistant',
+                        chatId: params.chatId,
+                      },
+                    })
+                  }
+                  await cleanup()
+                  break
                 }
-                break
-              }
 
-              const chunk = decoder.decode(value)
-              const lines = chunk.split('\n').filter((line) => line.trim())
+                const chunk = decoder.decode(value)
+                const lines = chunk.split('\n').filter((line) => line.trim())
 
-              for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                  const jsonString = line.slice(6)
-                  if (jsonString === '[DONE]') continue
+                for (const line of lines) {
+                  if (line.startsWith('data: ')) {
+                    const jsonString = line.slice(6)
+                    if (jsonString === '[DONE]') continue
 
-                  try {
-                    const jsonData = JSON.parse(jsonString)
-                    const content = jsonData.choices[0]?.delta?.content || ''
-                    if (content) {
-                      accumulatedContent += content
-                      const sseMessage = `data: ${JSON.stringify({ content })}\n\n`
-                      streamController.enqueue(new TextEncoder().encode(sseMessage))
+                    try {
+                      const jsonData = JSON.parse(jsonString)
+                      const content = jsonData.choices[0]?.delta?.content || ''
+                      if (content) {
+                        accumulatedContent += content
+                        const sseMessage = `data: ${JSON.stringify({ content })}\n\n`
+                        streamController.enqueue(new TextEncoder().encode(sseMessage))
+                      }
+                    } catch (e) {
+                      console.error('Error parsing JSON:', e)
                     }
-                  } catch (e) {
-                    console.error('Error parsing JSON:', e)
                   }
                 }
+              } catch (error) {
+                if (error.name === 'AbortError') {
+                  console.log('Read operation aborted')
+                  break
+                }
+                throw error
               }
             }
           } catch (error) {
             console.log('Stream error:', error)
-            if (controller.signal.aborted) {
-              console.log('Stream was aborted')
-              streamController.close()
-            } else {
+            if (error.name !== 'AbortError') {
               streamController.error(error)
             }
           } finally {
-            console.log('Stream finished or aborted for chatId:', params.chatId)
-            streamControllers.delete(params.chatId)
+            await cleanup()
           }
         },
       }),
