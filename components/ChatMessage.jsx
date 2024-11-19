@@ -29,9 +29,7 @@ export default function ChatMessage({ message, session }) {
       {/* Message content */}
       <div
         className={`rounded-[20px] ${
-          message.role === 'user'
-            ? 'max-w-[80%] bg-gray-100 px-4 py-2'
-            : `bg-white px-2 ${isPaused ? 'border-l-4 border-amber-400' : ''}`
+          message.role === 'user' ? 'max-w-[80%] bg-gray-100 px-4 py-2' : `bg-white px-2`
         }`}
       >
         {message.imageUrl && (
@@ -39,7 +37,6 @@ export default function ChatMessage({ message, session }) {
         )}
         <div className="prose prose-sm max-w-none">
           <ReactMarkdown>{displayContent}</ReactMarkdown>
-          {isPaused && <span className="ml-2 text-xs italic text-amber-600">(Message paused)</span>}
         </div>
       </div>
     </div>
