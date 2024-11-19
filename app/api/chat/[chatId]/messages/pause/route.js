@@ -10,14 +10,19 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Retrieve the AbortController for the given chatId from the streamControllers map
+    console.log('Attempting to pause chatId:', params.chatId)
+    console.log('Available controllers:', Array.from(streamControllers.entries()))
+
     const controller = streamControllers.get(params.chatId)
 
-    // If a controller is found, abort the stream and remove the controller from the map
-    if (controller) {
-      controller.abort()
-      streamControllers.delete(params.chatId)
+    if (!controller) {
+      console.log('No controller found for chatId:', params.chatId)
+      return NextResponse.json({ error: 'No active stream found' }, { status: 404 })
     }
+
+    console.log('Found controller, aborting stream for chatId:', params.chatId)
+    controller.abort()
+    streamControllers.delete(params.chatId)
 
     return NextResponse.json({ success: true })
   } catch (error) {

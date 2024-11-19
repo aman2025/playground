@@ -6,9 +6,18 @@ import { streamControllers } from '@/app/api/chat/streamControllers'
 
 export async function POST(request, { params }) {
   const controller = new AbortController()
-  // Add the AbortController to the streamControllers map with the chatId as the key
-  // This allows us to manage and abort the stream associated with this chatId if needed
-  streamControllers.set(params.chatId, controller)
+
+  // Add logging to debug controller creation
+  console.log('Creating controller for chatId:', params.chatId, controller)
+
+  // Ensure chatId exists before setting controller
+  if (params.chatId) {
+    streamControllers.set(params.chatId, controller)
+    console.log('StreamControllers after set:', Array.from(streamControllers.entries()))
+  } else {
+    console.error('No chatId provided for controller setup')
+    return NextResponse.json({ error: 'No chatId provided' }, { status: 400 })
+  }
 
   try {
     // Get the authenticated user's session

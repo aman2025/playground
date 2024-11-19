@@ -133,14 +133,19 @@ export default function ChatInputForm({ chatId }) {
 
     try {
       if (!chatId) {
-        const newChat = await createChatMutation.mutateAsync(input.trim())
-        queryClient.invalidateQueries({ queryKey: ['chats'] })
+        try {
+          // Create chat and wait for it to complete
+          const newChat = await createChatMutation.mutateAsync(input.trim())
+          await queryClient.invalidateQueries({ queryKey: ['chats'] })
 
-        // Don't await this call, don't use await
-        sendMessageMutation.mutate({
-          chatId: newChat.id,
-          formData,
-        })
+          // Now that we have the chat, wait for the message mutation
+          await sendMessageMutation.mutateAsync({
+            chatId: newChat.id,
+            formData,
+          })
+        } catch (error) {
+          console.error('Error creating chat and sending message:', error)
+        }
       } else {
         // Don't await this call
         sendMessageMutation.mutate({ chatId, formData })
