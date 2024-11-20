@@ -14,12 +14,7 @@ export async function POST(request, { params }) {
 
   const controller = new AbortController()
 
-  // Add logging to debug controller creation
-  console.log('Creating controller for chatId:', params.chatId)
-  console.log('Controller signal state:', controller.signal.aborted)
-
   streamControllers.set(params.chatId, controller)
-  console.log('Current streamControllers:', streamControllers.keys())
 
   try {
     // Get the authenticated user's session
