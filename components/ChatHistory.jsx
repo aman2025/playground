@@ -74,11 +74,11 @@ export default function ChatHistory() {
             <div
               key={chat.id}
               onClick={() => handleChatClick(chat.id)}
-              className={`block flex w-full cursor-pointer items-center justify-between rounded p-2 text-left ${
+              className={`group block flex w-full cursor-pointer items-center justify-between rounded p-2 text-left ${
                 currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
               }`}
             >
-              <span className="block truncate">{chat.title}</span>
+              <span className="block flex-grow truncate text-sm">{chat.title}</span>
               <ConfirmDialog
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
@@ -90,9 +90,9 @@ export default function ChatHistory() {
               >
                 <button
                   onClick={(e) => handleDelete(e, chat.id)}
-                  className="rounded p-1 hover:bg-gray-300"
+                  className="ml-2 hidden rounded p-0 group-hover:block"
                 >
-                  <Trash2 className="h-4 w-4 text-gray-500" />
+                  <Trash2 className="h-4 w-4 text-gray-500 hover:text-blue-600" />
                 </button>
               </ConfirmDialog>
             </div>
