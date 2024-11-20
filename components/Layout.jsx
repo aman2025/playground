@@ -46,9 +46,9 @@ export default function Layout({ session }) {
         <div className="p-3">
           <button
             onClick={handleNewChat}
-            className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-500 bg-white p-1 text-sm text-blue-500 hover:text-blue-800"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-500 bg-white p-1 text-sm text-blue-500 hover:border-blue-600 hover:text-blue-600"
           >
-            <Plus size={16} className="hover:text-blue-800" />
+            <Plus size={16} className="hover:text-blue-600" />
             New Chat
           </button>
         </div>
