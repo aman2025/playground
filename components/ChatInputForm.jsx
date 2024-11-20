@@ -10,7 +10,7 @@ export default function ChatInputForm({ chatId }) {
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
-  const { setCurrentChatId, setIsSending } = useChatStore()
+  const { setCurrentChatId, setIsSending, scrollToBottom } = useChatStore()
   const [isCancelling, setIsCancelling] = useState(false)
 
   // Mutation for creating a new chat
@@ -150,6 +150,9 @@ export default function ChatInputForm({ chatId }) {
         // Don't await this call
         sendMessageMutation.mutate({ chatId, formData })
       }
+
+      // Scroll to bottom after sending message, scrollToBottom is function from chat store
+      scrollToBottom?.()
 
       // Clear input immediately after sending
       setInput('')

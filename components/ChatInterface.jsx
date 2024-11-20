@@ -78,6 +78,25 @@ export default function ChatInterface({ session }) {
     }
   }, [messages, isSending, userScrolled])
 
+  // Add scroll to bottom function
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight
+        setUserScrolled(false) // Reset user scroll state
+      }
+    }
+  }
+
+  // Add to chat store for external access
+  useEffect(() => {
+    useChatStore.setState({ scrollToBottom })
+    return () => {
+      useChatStore.setState({ scrollToBottom: null })
+    }
+  }, [])
+
   return (
     <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
       <div className="h-full w-full" data-radix-scroll-area-viewport="">

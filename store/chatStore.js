@@ -6,4 +6,5 @@ export const useChatStore = create((set, get) => ({
   setCurrentChatId: (chatId) => set({ currentChatId: chatId }),
   isSending: false,
   setIsSending: (state) => set({ isSending: state }),
+  scrollToBottom: null,
 }))
