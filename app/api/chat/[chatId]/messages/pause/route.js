@@ -11,13 +11,16 @@ export async function POST(request, { params }) {
     }
 
     console.log('Attempting to pause chatId:', params.chatId)
-    console.log('Available controllers:', Array.from(streamControllers.entries()))
+    console.log('Current streamControllers:', streamControllers.keys())
 
     const controller = streamControllers.get(params.chatId)
 
     if (!controller) {
       console.log('No controller found for chatId:', params.chatId)
-      return NextResponse.json({ error: 'No active stream found' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'No active stream found', code: 'NO_STREAM' },
+        { status: 404 }
+      )
     }
 
     console.log('Found controller, aborting stream for chatId:', params.chatId)

@@ -167,7 +167,13 @@ export default function ChatInputForm({ chatId }) {
 
     try {
       setIsCancelling(true)
-      await chatApi.pauseMessage(chatId)
+      const response = await chatApi.pauseMessage(chatId)
+
+      if (response.error === 'No active stream found') {
+        // If no stream is found, just reset the UI state
+        console.log('No active stream found, resetting state')
+        setIsSending(false)
+      }
 
       // Invalidate the messages query to ensure UI is updated
       queryClient.invalidateQueries({
@@ -178,7 +184,7 @@ export default function ChatInputForm({ chatId }) {
       console.error('Error cancelling stream:', error)
     } finally {
       setIsCancelling(false)
-      setIsSending(false) // Reset sending state
+      setIsSending(false)
     }
   }
 

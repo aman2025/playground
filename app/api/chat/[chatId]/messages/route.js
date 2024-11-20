@@ -5,19 +5,21 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { streamControllers } from '@/app/api/chat/streamControllers'
 
 export async function POST(request, { params }) {
+  // Clear any existing controller for this chatId
+  if (streamControllers.has(params.chatId)) {
+    const existingController = streamControllers.get(params.chatId)
+    existingController.abort()
+    streamControllers.delete(params.chatId)
+  }
+
   const controller = new AbortController()
 
   // Add logging to debug controller creation
-  console.log('Creating controller for chatId:', params.chatId, controller)
+  console.log('Creating controller for chatId:', params.chatId)
+  console.log('Controller signal state:', controller.signal.aborted)
 
-  // Ensure chatId exists before setting controller
-  if (params.chatId) {
-    streamControllers.set(params.chatId, controller)
-    console.log('StreamControllers after set:', Array.from(streamControllers.entries()))
-  } else {
-    console.error('No chatId provided for controller setup')
-    return NextResponse.json({ error: 'No chatId provided' }, { status: 400 })
-  }
+  streamControllers.set(params.chatId, controller)
+  console.log('Current streamControllers:', streamControllers.keys())
 
   try {
     // Get the authenticated user's session
