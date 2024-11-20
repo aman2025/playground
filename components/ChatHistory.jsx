@@ -67,7 +67,7 @@ export default function ChatHistory() {
   }
 
   return (
-    <ScrollArea className="flex-1 p-3 pt-0" type="always">
+    <ScrollArea className="chat-history flex-1 p-3 pt-0" type="always">
       <div className="flex flex-col">
         <div>
           {chats.map((chat) => (
@@ -78,7 +78,7 @@ export default function ChatHistory() {
                 currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
               }`}
             >
-              <span>{chat.title}</span>
+              <span className="block truncate">{chat.title}</span>
               <ConfirmDialog
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}

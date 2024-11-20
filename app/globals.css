@@ -85,84 +85,11 @@ body {
     @apply bg-background text-foreground;
   }
 }
-/* todo: loading 需移到loading组件中 */
-.typing-indicator {
-  display: none;
-  padding: 20px;
-}
 
-.typing-indicator.active {
-  display: block;
-}
-
-.dots {
-  display: flex;
-  gap: 4px;
-}
-
-.dots span {
-  width: 8px;
-  height: 8px;
-  background-color: #8b8b8b;
-  border-radius: 50%;
-  animation: bounce 1.5s infinite;
-}
-
-.dots span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.dots span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes bounce {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-4px);
-  }
-}
-
-.typing-indicator {
-  display: none;
-  padding: 15px;
-}
-
-.typing-indicator.active {
-  display: block;
-}
-
-.typing-indicator .dots {
-  display: flex;
-  gap: 4px;
-}
-
-.typing-indicator .dots span {
-  width: 8px;
-  height: 8px;
-  background-color: #8e8ea0;
-  border-radius: 50%;
-  animation: bounce 1.4s infinite ease-in-out;
-}
-
-.typing-indicator .dots span:nth-child(1) {
-  animation-delay: -0.32s;
-}
-.typing-indicator .dots span:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes bounce {
-  0%,
-  80%,
-  100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
+/* 
+ * chat history scroll area viewport 
+ * 原来display:table, chat title导致overfow无效，
+*/
+.chat-history div[data-radix-scroll-area-viewport] > div {
+  display: block !important;
 }
