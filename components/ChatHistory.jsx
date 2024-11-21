@@ -74,7 +74,7 @@ export default function ChatHistory() {
             <div
               key={chat.id}
               onClick={() => handleChatClick(chat.id)}
-              className={`group block flex w-full cursor-pointer items-center justify-between rounded p-2 text-left ${
+              className={`group mb-1 block flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-left ${
                 currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
               }`}
             >

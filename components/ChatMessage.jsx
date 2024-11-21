@@ -22,7 +22,7 @@ export default function ChatMessage({ message, session }) {
             </AvatarFallback>
           </Avatar>
         ) : (
-          <img src="/images/logo.png" alt="Assistant" className="h-8 w-8 rounded-full" />
+          <img src="/images/assistant.png" alt="Assistant" className="h-8 w-8 rounded-full" />
         )}
       </div>
 
