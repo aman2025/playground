@@ -228,72 +228,74 @@ export default function ChatInputForm({ chatId }) {
   }, [input]) // Re-run when input changes
 
   return (
-    <div className="relative rounded-lg border bg-white p-2">
-      {/* Hidden file input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        className="hidden"
-      />
+    <div className="flex justify-center p-3">
+      <div className="relative flex w-full max-w-screen-md flex-col rounded-[20px] border border-gray-200 bg-white p-2">
+        {/* Hidden file input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept="image/*"
+          className="hidden"
+        />
 
-      {/* Image preview area */}
-      {imagePreview && (
-        <div className="relative mb-2">
-          <div className="relative inline-block">
-            <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg object-cover" />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute -right-2 -top-2 h-6 w-6 rounded-full bg-gray-800/50 p-1 text-white hover:bg-gray-900/50"
-              onClick={handleRemoveImage}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Main input area */}
-      <textarea
-        ref={textareaRef}
-        rows={1}
-        placeholder="Type a message..."
-        className="w-full resize-none overflow-y-auto border-0 bg-transparent px-2 py-2 focus:outline-none focus:ring-0"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        style={{ maxHeight: '9rem' }} // Approximately 6 lines of text
-      />
-
-      {/* Bottom controls area */}
-      <div className="flex items-center justify-between border-t pt-2">
-        {/* Image upload button with tooltip */}
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
+        {/* Image preview area */}
+        {imagePreview && (
+          <div className="relative mb-2">
+            <div className="relative inline-block">
+              <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg object-cover" />
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-gray-500 hover:text-gray-700"
-                onClick={() => fileInputRef.current?.click()}
+                className="absolute -right-1 -top-1 h-4 w-4 rounded-full bg-gray-800/50 p-0.5 text-white hover:bg-gray-900/50"
+                onClick={handleRemoveImage}
               >
-                <ImageIcon className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </Button>
-            </TooltipTrigger>
-            <TooltipContent>Upload image</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+            </div>
+          </div>
+        )}
 
-        {/* Send button */}
-        <Button
-          size="icon"
-          disabled={isCancelling || createChatMutation.isPending || sendMessageMutation.isPending}
-          className="bg-blue-500 hover:bg-blue-600"
-          onClick={handleSubmit}
-        >
-          <SendIcon className="h-5 w-5 text-white" />
-        </Button>
+        {/* Main input area */}
+        <textarea
+          ref={textareaRef}
+          rows={1}
+          placeholder="Type a message..."
+          className="w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-sm focus:outline-none focus:ring-0"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          style={{ maxHeight: '9rem' }} // Approximately 6 lines of text
+        />
+
+        {/* Bottom controls area */}
+        <div className="flex items-center justify-between pt-2">
+          {/* Image upload button with tooltip */}
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-[10px] text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <ImageIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Upload image</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Send button */}
+          <Button
+            size="icon"
+            disabled={isCancelling || createChatMutation.isPending || sendMessageMutation.isPending}
+            className="h-8 w-8 rounded-[10px] bg-blue-500 hover:bg-blue-600"
+            onClick={handleSubmit}
+          >
+            <SendIcon className="h-5 w-5 text-white" />
+          </Button>
+        </div>
       </div>
     </div>
   )

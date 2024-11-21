@@ -10,7 +10,7 @@ body {
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 210 100% 20%;
+    --foreground: 217 33% 15%;
 
     --muted: 210 50% 90%;
     --muted-foreground: 210 50% 40%;
