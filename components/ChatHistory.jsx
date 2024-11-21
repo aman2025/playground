@@ -67,7 +67,7 @@ export default function ChatHistory() {
   }
 
   return (
-    <ScrollArea className="chat-history flex-1 p-3 pt-0" type="always">
+    <ScrollArea className="chat-history flex-1 px-3" type="always">
       <div className="flex flex-col">
         <div>
           {chats.map((chat) => (
@@ -92,7 +92,7 @@ export default function ChatHistory() {
                   onClick={(e) => handleDelete(e, chat.id)}
                   className="ml-2 hidden rounded p-0 group-hover:block"
                 >
-                  <Trash2 className="h-[15px] w-[15px] text-gray-500 hover:text-blue-600" />
+                  <Trash2 className="h-3.5 w-3.5 text-gray-500 hover:text-blue-600" />
                 </button>
               </ConfirmDialog>
             </div>
