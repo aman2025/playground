@@ -264,9 +264,7 @@ export default function ChatInputForm({ chatId }) {
                 <ImageIcon className="h-5 w-5" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent className="border border-gray-200 bg-white text-gray-800 shadow-md">
-              <p>Upload image</p>
-            </TooltipContent>
+            <TooltipContent>Upload image</TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
