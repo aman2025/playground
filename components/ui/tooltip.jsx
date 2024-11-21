@@ -5,7 +5,11 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 
 import { cn } from '@/lib/utils'
 
-const TooltipProvider = TooltipPrimitive.Provider
+// Set default delay to 0 for immediate show
+const TooltipProvider = ({ delayDuration = 0, ...props }) => (
+  <TooltipPrimitive.Provider delayDuration={delayDuration} {...props} />
+)
+
 const TooltipRoot = TooltipPrimitive.Root
 const TooltipTrigger = TooltipPrimitive.Trigger
 
@@ -25,13 +29,12 @@ const TooltipContent = React.forwardRef(({ className, sideOffset = 4, ...props }
       width={8}
       height={4}
       style={{
-        filter: 'drop-shadow(0 1px 0 rgb(229 231 235))', // Simulates border for arrow
-        marginTop: '-1px', // Adjusts arrow position to overlap with border
+        filter: 'drop-shadow(0 1px 0 rgb(229 231 235))',
+        marginTop: '-1px',
       }}
     />
   </TooltipPrimitive.Content>
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-// Export components
 export { TooltipProvider, TooltipRoot as Tooltip, TooltipTrigger, TooltipContent }

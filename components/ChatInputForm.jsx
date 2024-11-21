@@ -252,7 +252,7 @@ export default function ChatInputForm({ chatId }) {
       {/* Bottom controls area */}
       <div className="flex items-center justify-between border-t pt-2">
         {/* Image upload button with tooltip */}
-        <TooltipProvider>
+        <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
