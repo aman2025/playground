@@ -15,6 +15,7 @@ export default function ChatInputForm({ chatId }) {
   const { setCurrentChatId, setIsSending, scrollToBottom } = useChatStore()
   const [isCancelling, setIsCancelling] = useState(false)
   const [imagePreview, setImagePreview] = useState(null)
+  const textareaRef = useRef(null)
 
   // Mutation for creating a new chat
   const createChatMutation = useMutation({
@@ -212,6 +213,20 @@ export default function ChatInputForm({ chatId }) {
     }
   }
 
+  // Add this useEffect for auto-resizing
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    // Reset height to auto to get the correct scrollHeight
+    textarea.style.height = 'auto'
+    // Calculate new height (limit to 6 rows worth of height)
+    const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight)
+    const maxHeight = lineHeight * 6
+    const newHeight = Math.min(textarea.scrollHeight, maxHeight)
+    textarea.style.height = `${newHeight}px`
+  }, [input]) // Re-run when input changes
+
   return (
     <div className="relative rounded-lg border bg-white p-2">
       {/* Hidden file input */}
@@ -242,11 +257,13 @@ export default function ChatInputForm({ chatId }) {
 
       {/* Main input area */}
       <textarea
+        ref={textareaRef}
         rows={1}
         placeholder="Type a message..."
-        className="w-full resize-none border-0 bg-transparent px-2 py-2 focus:outline-none focus:ring-0"
+        className="w-full resize-none overflow-y-auto border-0 bg-transparent px-2 py-2 focus:outline-none focus:ring-0"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        style={{ maxHeight: '9rem' }} // Approximately 6 lines of text
       />
 
       {/* Bottom controls area */}
