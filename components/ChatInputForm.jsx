@@ -3,7 +3,9 @@ import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { chatApi } from '../services/api'
 import { useChatStore } from '../store/chatStore'
-import { Send, Square } from 'lucide-react'
+import { ImageIcon, SendIcon, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // ChatInputForm component handles message input and file attachment
 export default function ChatInputForm({ chatId }) {
@@ -12,6 +14,7 @@ export default function ChatInputForm({ chatId }) {
   const queryClient = useQueryClient()
   const { setCurrentChatId, setIsSending, scrollToBottom } = useChatStore()
   const [isCancelling, setIsCancelling] = useState(false)
+  const [imagePreview, setImagePreview] = useState(null)
 
   // Mutation for creating a new chat
   const createChatMutation = useMutation({
@@ -191,45 +194,92 @@ export default function ChatInputForm({ chatId }) {
     }
   }
 
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Create preview URL for the image
+      const previewUrl = URL.createObjectURL(file)
+      setImagePreview(previewUrl)
+    }
+  }
+
+  // Handle removing the image
+  const handleRemoveImage = () => {
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   return (
-    <div className="flex justify-center bg-white">
-      <form onSubmit={handleSubmit} className="flex w-full max-w-screen-md bg-gray-100 pb-4 pt-4">
-        <div className="flex w-full flex-col gap-2">
-          <div className="flex gap-2">
-            <input type="file" ref={fileInputRef} accept="image/*" className="hidden" />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="rounded bg-gray-200 p-2"
+    <div className="relative rounded-lg border bg-white p-2">
+      {/* Hidden file input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
+
+      {/* Image preview area */}
+      {imagePreview && (
+        <div className="relative mb-2">
+          <div className="relative inline-block">
+            <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg object-cover" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -right-2 -top-2 h-6 w-6 rounded-full bg-gray-800/50 p-1 text-white hover:bg-gray-900/50"
+              onClick={handleRemoveImage}
             >
-              📎
-            </button>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 rounded border p-2"
-              placeholder="Type a message..."
-            />
-            <button
-              type="button"
-              onClick={handleCancelStream}
-              disabled={isCancelling}
-              className={`rounded-[8px] px-3 py-2 text-white ${
-                createChatMutation.isPending || sendMessageMutation.isPending
-                  ? 'cursor-pointer bg-blue-300'
-                  : 'bg-blue-500 hover:bg-blue-600'
-              } ${isCancelling ? 'opacity-50' : ''}`}
-            >
-              {(createChatMutation.isPending || sendMessageMutation.isPending) && !isCancelling ? (
-                <Square className="h-5 w-5" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </button>
+              <X className="h-4 w-4" />
+            </Button>
           </div>
         </div>
-      </form>
+      )}
+
+      {/* Main input area */}
+      <textarea
+        rows={1}
+        placeholder="Type a message..."
+        className="w-full resize-none border-0 bg-transparent px-2 py-2 focus:outline-none focus:ring-0"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
+
+      {/* Bottom controls area */}
+      <div className="flex items-center justify-between border-t pt-2">
+        {/* Image upload button with tooltip */}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-gray-500 hover:text-gray-700"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImageIcon className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="border border-gray-200 bg-white text-gray-800 shadow-md">
+              <p>Upload image</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        {/* Send button */}
+        <Button
+          size="icon"
+          disabled={isCancelling || createChatMutation.isPending || sendMessageMutation.isPending}
+          className="bg-blue-500 hover:bg-blue-600"
+          onClick={handleSubmit}
+        >
+          <SendIcon className="h-5 w-5 text-white" />
+        </Button>
+      </div>
     </div>
   )
 }
