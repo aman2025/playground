@@ -92,7 +92,7 @@ export default function ChatHistory() {
                   onClick={(e) => handleDelete(e, chat.id)}
                   className="ml-2 hidden rounded p-0 group-hover:block"
                 >
-                  <Trash2 className="h-4 w-4 text-gray-500 hover:text-blue-600" />
+                  <Trash2 className="h-[15px] w-[15px] text-gray-500 hover:text-blue-600" />
                 </button>
               </ConfirmDialog>
             </div>
