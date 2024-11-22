@@ -229,7 +229,10 @@ export default function ChatInputForm({ chatId }) {
 
   return (
     <div className="flex justify-center p-3">
-      <div className="relative flex w-full max-w-screen-md flex-col rounded-[20px] border border-gray-200 bg-white p-2">
+      <div
+        className="relative flex w-full max-w-screen-md flex-col rounded-[20px] border border-gray-200 bg-white p-2"
+        style={{ boxShadow: '0px 0px 8px 0px rgba(0, 0, 0, 0.06)' }}
+      >
         {/* Hidden file input */}
         <input
           type="file"
