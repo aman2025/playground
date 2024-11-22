@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { chatApi } from '../services/api'
 import { useChatStore } from '../store/chatStore'
-import { ImageIcon, SendIcon, X } from 'lucide-react'
+import { ImageIcon, SendIcon, X, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
@@ -227,6 +227,18 @@ export default function ChatInputForm({ chatId }) {
     textarea.style.height = `${newHeight}px`
   }, [input]) // Re-run when input changes
 
+  // Add this handler function near your other handlers
+  const handleKeyDown = (e) => {
+    // Send message on Enter, but allow Shift+Enter for new lines
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault() // Prevent default to avoid new line
+      if (input.trim()) {
+        // Only send if input is not empty
+        handleSubmit(e)
+      }
+    }
+  }
+
   return (
     <div className="flex justify-center p-3">
       <div
@@ -267,7 +279,8 @@ export default function ChatInputForm({ chatId }) {
           className="w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-sm focus:outline-none focus:ring-0"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          style={{ maxHeight: '9rem' }} // Approximately 6 lines of text
+          onKeyDown={handleKeyDown}
+          style={{ maxHeight: '9rem' }}
         />
 
         {/* Bottom controls area */}
@@ -292,11 +305,25 @@ export default function ChatInputForm({ chatId }) {
           {/* Send button */}
           <Button
             size="icon"
-            disabled={isCancelling || createChatMutation.isPending || sendMessageMutation.isPending}
-            className="h-8 w-8 rounded-[10px] bg-blue-500 hover:bg-blue-600"
-            onClick={handleSubmit}
+            disabled={
+              !input.trim() && !createChatMutation.isPending && !sendMessageMutation.isPending
+            }
+            className={`h-8 w-8 rounded-[10px] ${
+              !input.trim() && !createChatMutation.isPending && !sendMessageMutation.isPending
+                ? 'cursor-not-allowed bg-gray-300 text-gray-500'
+                : 'bg-blue-500 hover:bg-blue-600'
+            }`}
+            onClick={
+              createChatMutation.isPending || sendMessageMutation.isPending
+                ? handleCancelStream
+                : handleSubmit
+            }
           >
-            <SendIcon className="h-5 w-5 text-white" />
+            {(createChatMutation.isPending || sendMessageMutation.isPending) && !isCancelling ? (
+              <Square className="h-5 w-5" />
+            ) : (
+              <SendIcon className="h-5 w-5" />
+            )}
           </Button>
         </div>
       </div>
