@@ -99,7 +99,7 @@ export default function ChatInterface({ session }) {
 
   return (
     <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
-      <div className="h-full w-full" data-radix-scroll-area-viewport="">
+      <div className="h-full w-full pt-6" data-radix-scroll-area-viewport="">
         <div className="flex justify-center">
           <div className="flex w-full max-w-[818px]">
             {isLoading ? (
