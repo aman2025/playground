@@ -28,7 +28,7 @@ export default function ChatMessage({ message, session }) {
 
       {/* Message content */}
       <div
-        className={`rounded-[20px] ${
+        className={`group relative rounded-[20px] ${
           message.role === 'user' ? 'max-w-[80%] bg-gray-100 px-4 py-2' : `bg-white px-2`
         }`}
       >
@@ -37,6 +37,36 @@ export default function ChatMessage({ message, session }) {
         )}
         <div className="prose prose-sm max-w-none">
           <ReactMarkdown>{displayContent}</ReactMarkdown>
+        </div>
+        {/* Timestamp positioned absolutely with conditional alignment */}
+        <div
+          className={`absolute bottom-0 translate-y-full pt-1 text-xs text-gray-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${
+            message.role === 'user' ? 'right-2' : 'left-0'
+          }`}
+        >
+          {message.createdAt
+            ? (() => {
+                const messageDate = new Date(message.createdAt)
+                const today = new Date()
+                const isToday = messageDate.toDateString() === today.toDateString()
+
+                if (isToday) {
+                  return messageDate.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  })
+                }
+
+                return messageDate.toLocaleString('en-US', {
+                  day: 'numeric',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false,
+                })
+              })()
+            : ''}
         </div>
       </div>
     </div>
