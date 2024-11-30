@@ -14,7 +14,7 @@ export const useChatStore = create((set) => ({
   scrollToBottom: null,
   contextWindow: [],
   // Add function to capture context before sending
-  captureContextWindow: (messages) => {
+  setContextWindow: (messages) => {
     if (!messages?.length) {
       console.log('Context Window Captured: Empty (New Chat)')
       return set({ contextWindow: [] })

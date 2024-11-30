@@ -10,7 +10,7 @@ import { useRef, useState, useEffect } from 'react'
 export default function ChatInterface({ session }) {
   const currentChatId = useChatStore((state) => state.currentChatId)
   const isSending = useChatStore((state) => state.isSending)
-  const { captureContextWindow } = useChatStore.getState()
+  const { setContextWindow } = useChatStore.getState()
 
   // Add a ref to track if we should update context
   const shouldUpdateContext = useRef(true)
@@ -44,7 +44,7 @@ export default function ChatInterface({ session }) {
   // Modify the messages effect to only update context when not streaming
   useEffect(() => {
     if (shouldUpdateContext.current && !isSending && messages?.length > 0) {
-      captureContextWindow(messages)
+      setContextWindow(messages)
     }
   }, [messages, isSending])
 
