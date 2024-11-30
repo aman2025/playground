@@ -113,27 +113,6 @@ export default function ChatInterface({ session }) {
     }
   }, [])
 
-  const handleSendMessage = async (content) => {
-    try {
-      // Capture context before sending
-      captureContextWindow(messages)
-      // Disable context updates while streaming
-      shouldUpdateContext.current = false
-
-      setIsSending(true)
-      // ... existing send message code ...
-    } catch (error) {
-      console.error('Error sending message:', error)
-    }
-  }
-
-  // Re-enable context updates when streaming is complete
-  useEffect(() => {
-    if (!isSending) {
-      shouldUpdateContext.current = true
-    }
-  }, [isSending])
-
   return (
     <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
       <div className="h-full w-full pt-6" data-radix-scroll-area-viewport="">
