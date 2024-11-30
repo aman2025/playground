@@ -2,13 +2,8 @@ import { create } from 'zustand'
 
 export const useChatStore = create((set) => ({
   currentChatId: null,
-  setCurrentChatId: (chatId) => {
-    // Reset context window when switching to a new chat
-    set({
-      currentChatId: chatId,
-      contextWindow: [],
-    })
-  },
+  setCurrentChatId: (chatId) => set({ currentChatId: chatId }),
+
   isSending: false,
   setIsSending: (state) => set({ isSending: state }),
   scrollToBottom: null,
