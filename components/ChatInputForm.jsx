@@ -136,8 +136,7 @@ export default function ChatInputForm({ chatId }) {
     }
 
     try {
-      // Clear input and file immediately after starting to send
-      const currentInput = input // Store current input before clearing
+      const currentInput = input
       setInput('')
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
@@ -145,12 +144,13 @@ export default function ChatInputForm({ chatId }) {
       setImagePreview(null)
 
       if (!chatId) {
+        // Reset context window for new chat
+        useChatStore.setState({ contextWindow: [] })
+
         try {
-          // Create chat and wait for it to complete
           const newChat = await createChatMutation.mutateAsync(currentInput.trim())
           await queryClient.invalidateQueries({ queryKey: ['chats'] })
 
-          // Now that we have the chat, wait for the message mutation
           await sendMessageMutation.mutateAsync({
             chatId: newChat.id,
             formData,
@@ -159,11 +159,9 @@ export default function ChatInputForm({ chatId }) {
           console.error('Error creating chat and sending message:', error)
         }
       } else {
-        // Don't await this call
         sendMessageMutation.mutate({ chatId, formData })
       }
 
-      // Scroll to bottom after sending message
       scrollToBottom?.()
     } catch (error) {
       console.error('Error:', error)
