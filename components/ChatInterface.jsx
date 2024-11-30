@@ -8,7 +8,12 @@ import Loading from '@/components/Loading'
 import { useRef, useState, useEffect } from 'react'
 
 export default function ChatInterface({ session }) {
-  const { currentChatId, isSending } = useChatStore()
+  const currentChatId = useChatStore((state) => state.currentChatId)
+  const isSending = useChatStore((state) => state.isSending)
+  const { captureContextWindow } = useChatStore.getState()
+
+  // Add a ref to track if we should update context
+  const shouldUpdateContext = useRef(true)
 
   // Fetch messages using React Query first
   const {
@@ -31,11 +36,22 @@ export default function ChatInterface({ session }) {
       if (!Array.isArray(data)) return []
       return data.map((message) => ({
         ...message,
-        // Add visual indicator for paused messages
         isPaused: message.status === 'paused',
       }))
     },
   })
+
+  // Modify the messages effect to only update context when not streaming
+  useEffect(() => {
+    if (shouldUpdateContext.current && !isSending && messages?.length > 0) {
+      captureContextWindow(messages)
+    }
+  }, [messages, isSending])
+
+  // Disable context updates when streaming starts, re-enable when it ends
+  useEffect(() => {
+    shouldUpdateContext.current = !isSending
+  }, [isSending])
 
   // Add refs and state for scroll management
   const scrollAreaRef = useRef(null)
@@ -96,6 +112,27 @@ export default function ChatInterface({ session }) {
       useChatStore.setState({ scrollToBottom: null })
     }
   }, [])
+
+  const handleSendMessage = async (content) => {
+    try {
+      // Capture context before sending
+      captureContextWindow(messages)
+      // Disable context updates while streaming
+      shouldUpdateContext.current = false
+
+      setIsSending(true)
+      // ... existing send message code ...
+    } catch (error) {
+      console.error('Error sending message:', error)
+    }
+  }
+
+  // Re-enable context updates when streaming is complete
+  useEffect(() => {
+    if (!isSending) {
+      shouldUpdateContext.current = true
+    }
+  }, [isSending])
 
   return (
     <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
