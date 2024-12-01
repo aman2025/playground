@@ -39,6 +39,11 @@ export async function POST(request, { params }) {
     const content = formData.get('content')
     const image = formData.get('image')
 
+    // Extract actual user message if it contains context
+    const userMessage = content.includes('Previous context:')
+      ? content.split('User: ').pop()
+      : content
+
     // Handle image upload if present
     let imageUrl = null
     if (image) {
@@ -46,10 +51,10 @@ export async function POST(request, { params }) {
       // imageUrl = await uploadImage(image);
     }
 
-    // Save user message
-    const userMessage = await prisma.message.create({
+    // Save user message with actual input only
+    const savedUserMessage = await prisma.message.create({
       data: {
-        content,
+        content: userMessage,
         role: 'user',
         chatId: params.chatId,
         imageUrl,

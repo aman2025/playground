@@ -130,7 +130,15 @@ export default function ChatInputForm({ chatId }) {
     if (!input.trim()) return
 
     const formData = new FormData()
-    formData.append('content', input)
+
+    // Combine context window with current input
+    const contextWindow = useChatStore.getState().contextWindow
+    const contextPrompt = contextWindow.map((msg) => `${msg.role}: ${msg.content}`).join('\n')
+    const fullPrompt = contextWindow.length
+      ? `Previous context:\n${contextPrompt}\n\nUser: ${input}`
+      : input
+
+    formData.append('content', fullPrompt)
     if (fileInputRef.current?.files?.[0]) {
       formData.append('image', fileInputRef.current.files[0])
     }
