@@ -12,7 +12,7 @@ import { Plus } from 'lucide-react'
 
 // Main Layout component
 export default function Layout({ session }) {
-  const { setCurrentChatId, currentChatId } = useChatStore()
+  const { setCurrentChatId, currentChatId, setContextWindow } = useChatStore()
   const pathname = usePathname()
 
   // Handle initial route and refresh, load current chat id from url
@@ -27,6 +27,7 @@ export default function Layout({ session }) {
 
   const handleNewChat = () => {
     setCurrentChatId(null)
+    setContextWindow([])
     router.push('/chat')
   }
 
