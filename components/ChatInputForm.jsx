@@ -97,10 +97,14 @@ export default function ChatInputForm({ chatId }) {
       // Snapshot the previous value
       const previousMessages = queryClient.getQueryData(['messages', chatId])
 
-      // Optimistically update the messages cache
+      // Get just the user's message without context
+      const userMessage = formData.get('content')
+      const actualUserMessage = userMessage.split('\n\nUser: ').pop() || userMessage
+
+      // Update optimistic message to show only the actual user message
       const optimisticMessage = {
-        id: 'temp-' + Date.now(), // Temporary ID
-        content: formData.get('content'),
+        id: 'temp-' + Date.now(),
+        content: actualUserMessage, // Use actual user message instead of full prompt
         role: 'user',
         image: formData.get('image') ? URL.createObjectURL(formData.get('image')) : null,
         createdAt: new Date().toISOString(),
