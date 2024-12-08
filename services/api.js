@@ -1,3 +1,4 @@
+// 所有chat相关的api，都放在这里
 import axios from 'axios'
 
 // Create axios instance with default config
@@ -20,10 +21,10 @@ api.interceptors.response.use(
 // Chat related API calls, for react-query
 export const chatApi = {
   // Get all chats with message count
-  getAllChats: () => api.get('/chats', { params: { include_message_count: true } }),
+  getAllChats: () => api.get('/chat', { params: { include_message_count: true } }),
 
   // Create a new chat
-  createChat: (title) => api.post('/chats', { title }),
+  createChat: (title) => api.post('/chat', { title }),
 
   // Send message to a chat, Modify sendMessage to return the raw response without reading it, don't use axios.post
   async sendMessage(chatId, formData) {
@@ -51,7 +52,7 @@ export const chatApi = {
   },
 
   deleteChat: async (chatId) => {
-    const response = await fetch(`/api/chats/${chatId}`, {
+    const response = await fetch(`/api/chat/${chatId}`, {
       method: 'DELETE',
     })
     if (!response.ok) {
