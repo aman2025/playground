@@ -3,6 +3,16 @@ import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { streamControllers } from '@/app/api/chat/streamControllers'
+import fs from 'fs'
+import path from 'path'
+
+// Define the upload directory
+const uploadDir = path.join(process.cwd(), 'public', 'upload')
+
+// Ensure the upload directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true })
+}
 
 export async function POST(request, { params }) {
   // Clear any existing controller for this chatId
@@ -47,8 +57,15 @@ export async function POST(request, { params }) {
     // Handle image upload if present
     let imageUrl = null
     if (image) {
-      // Implement image upload logic here
-      // imageUrl = await uploadImage(image);
+      const buffer = Buffer.from(await image.arrayBuffer())
+      const imageName = `${Date.now()}-${image.name}`
+      const imagePath = path.join(uploadDir, imageName)
+
+      // Save the image to the upload directory
+      fs.writeFileSync(imagePath, buffer)
+
+      // Set the image URL
+      imageUrl = `/upload/${imageName}`
     }
 
     // Save user message with actual input only
