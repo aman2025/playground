@@ -235,6 +235,9 @@ export default function ChatInputForm({ chatId }) {
 
   // Handle removing the image
   const handleRemoveImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview)
+    }
     setImagePreview(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -266,6 +269,49 @@ export default function ChatInputForm({ chatId }) {
       }
     }
   }
+
+  // Add a new handler function for paste events
+  const handlePaste = async (e) => {
+    // Get clipboard items
+    const items = e.clipboardData?.items
+
+    if (!items) return
+
+    // Look for image items in clipboard
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        // Prevent default paste behavior
+        e.preventDefault()
+
+        // Get the image file from clipboard
+        const file = item.getAsFile()
+        if (!file) continue
+
+        // Create preview URL for the image
+        const previewUrl = URL.createObjectURL(file)
+        setImagePreview(previewUrl)
+
+        // Set the file in the file input
+        const dataTransfer = new DataTransfer()
+        dataTransfer.items.add(file)
+        if (fileInputRef.current) {
+          fileInputRef.current.files = dataTransfer.files
+        }
+
+        break
+      }
+    }
+  }
+
+  // Add this useEffect for cleanup
+  useEffect(() => {
+    return () => {
+      // Cleanup preview URL when component unmounts
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview)
+      }
+    }
+  }, [imagePreview])
 
   return (
     <div className="flex justify-center p-3">
@@ -308,6 +354,7 @@ export default function ChatInputForm({ chatId }) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
           style={{ maxHeight: '9rem' }}
         />
 
