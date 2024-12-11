@@ -33,7 +33,13 @@ export default function ChatMessage({ message, session }) {
         }`}
       >
         {message.imageUrl && (
-          <img src={message.imageUrl} alt="Uploaded content" className="mb-2 max-w-sm rounded" />
+          <div className="mb-2 h-20 w-32 overflow-hidden rounded border border-gray-200 bg-white">
+            <img
+              src={message.imageUrl}
+              alt="Uploaded content"
+              className="h-full w-full object-contain"
+            />
+          </div>
         )}
         <div className="prose prose-sm max-w-none">
           <ReactMarkdown>{displayContent}</ReactMarkdown>
