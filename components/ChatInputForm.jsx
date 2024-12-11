@@ -17,6 +17,16 @@ export default function ChatInputForm({ chatId }) {
   const [imagePreview, setImagePreview] = useState(null)
   const textareaRef = useRef(null)
 
+  // Add this helper function at the top of the component
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = (error) => reject(error)
+    })
+  }
+
   // Mutation for creating a new chat
   const createChatMutation = useMutation({
     mutationFn: async (title) => {
@@ -101,12 +111,18 @@ export default function ChatInputForm({ chatId }) {
       const userMessage = formData.get('content')
       const actualUserMessage = userMessage.split('\n\nUser: ').pop() || userMessage
 
+      // Convert image to base64 if present
+      let base64Image = null
+      const imageFile = formData.get('image')
+      if (imageFile) {
+        base64Image = await fileToBase64(imageFile)
+      }
       // Update optimistic message to show only the actual user message
       const optimisticMessage = {
         id: 'temp-' + Date.now(),
-        content: actualUserMessage, // Use actual user message instead of full prompt
+        content: actualUserMessage,
         role: 'user',
-        image: formData.get('image') ? URL.createObjectURL(formData.get('image')) : null,
+        imageUrl: base64Image, // Use base64 image instead of URL.createObjectURL
         createdAt: new Date().toISOString(),
       }
       // add user message
