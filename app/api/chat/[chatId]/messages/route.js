@@ -5,6 +5,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { streamControllers } from '@/app/api/chat/streamControllers'
 import fs from 'fs'
 import path from 'path'
+import { Buffer } from 'buffer'
 
 // Define the upload directory
 const uploadDir = path.join(process.cwd(), 'public', 'upload')
@@ -12,6 +13,24 @@ const uploadDir = path.join(process.cwd(), 'public', 'upload')
 // Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true })
+}
+
+// Helper function to convert image to base64
+const imageToBase64 = async (buffer) => {
+  return Buffer.from(buffer).toString('base64')
+}
+
+// Helper function to get image MIME type
+const getImageMimeType = (filename) => {
+  const ext = filename.split('.').pop().toLowerCase()
+  const mimeTypes = {
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    gif: 'image/gif',
+    webp: 'image/webp',
+  }
+  return mimeTypes[ext] || 'image/jpeg'
 }
 
 export async function POST(request, { params }) {
@@ -54,47 +73,52 @@ export async function POST(request, { params }) {
       ? content.split('User: ').pop()
       : content
 
-    // Handle image upload if present
+    // Format messages array for Mistral API
+    let messages = []
+
+    // Add text content
+    messages.push({
+      role: 'user',
+      content: [
+        {
+          type: 'text',
+          text: content,
+        },
+      ],
+    })
+
+    // Handle image if present
     let imageUrl = null
     if (image) {
-      const buffer = Buffer.from(await image.arrayBuffer())
+      // Convert image to base64
+      const imageBuffer = Buffer.from(await image.arrayBuffer())
+      const base64Image = await imageToBase64(imageBuffer)
+      const mimeType = getImageMimeType(image.name)
+
+      // Save original image to upload directory
       const imageName = `${Date.now()}-${image.name}`
       const imagePath = path.join(uploadDir, imageName)
-
-      // Save the image to the upload directory
-      fs.writeFileSync(imagePath, buffer)
-
-      // Set the image URL
+      fs.writeFileSync(imagePath, imageBuffer)
       imageUrl = `/upload/${imageName}`
+
+      // Add image content to messages
+      messages[0].content.push({
+        type: 'image_url',
+        image_url: `data:${mimeType};base64,${base64Image}`,
+      })
     }
 
-    // Save user message with actual input only
+    // Save user message to database
     const savedUserMessage = await prisma.message.create({
       data: {
         content: userMessage,
         role: 'user',
         chatId: params.chatId,
-        imageUrl,
+        imageUrl, // Store the public URL of the saved image
       },
     })
 
-    // Get chat history for context
-    const chatHistory = await prisma.message.findMany({
-      where: { chatId: params.chatId },
-      orderBy: { createdAt: 'asc' },
-      take: 10, // Limit context to last 10 messages
-    })
-
-    // Format messages for Mistral API
-    const messages = chatHistory.map((msg) => ({
-      role: msg.role,
-      content: msg.content,
-    }))
-
-    // Add current message
-    messages.push({ role: 'user', content })
-
-    // Call Mistral API with conversation history
+    // Call Mistral API with the messages including image
     const mistralResponse = await fetch(process.env.MISTRAL_API_ENDPOINT, {
       method: 'POST',
       headers: {
