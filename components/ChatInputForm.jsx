@@ -354,14 +354,14 @@ export default function ChatInputForm({ chatId }) {
 
         {/* Image preview area */}
         {imagePreview && (
-          <div className="relative mb-2">
+          <div className="relative">
             <div className="relative inline-block">
-              <div className="mb-2 h-20 w-32 overflow-hidden rounded border border-gray-200 bg-white">
+              <div className="h-20 w-32 overflow-hidden rounded border border-gray-200 bg-white">
                 <img
                   ref={previewZoomRef}
                   src={imagePreview}
                   alt="Preview"
-                  className="h-full w-full cursor-zoom-in object-cover"
+                  className="h-full w-full object-contain"
                 />
               </div>
               <Button
