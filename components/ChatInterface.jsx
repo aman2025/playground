@@ -1,5 +1,6 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from '@/components/ui/skeleton'
 import ChatMessage from './ChatMessage'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
@@ -113,15 +114,28 @@ export default function ChatInterface({ session }) {
     }
   }, [])
 
+  // Create a loading skeleton component
+  const MessageSkeleton = () => (
+    <div className="flex w-full flex-col space-y-4 py-4">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="flex items-start space-x-4">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-[250px]" />
+            <Skeleton className="h-4 w-[400px]" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
       <div className="h-full w-full pt-6" data-radix-scroll-area-viewport="">
         <div className="flex justify-center">
           <div className="flex w-full max-w-[818px]">
             {isLoading ? (
-              <div className="flex h-full items-center justify-center text-gray-400">
-                Loading messages...
-              </div>
+              <MessageSkeleton />
             ) : isError ? (
               <div className="flex h-full items-center justify-center text-red-500">
                 Error: {error?.message || 'Failed to load messages'}

@@ -12,8 +12,8 @@ body {
     --background: 0 0% 100%;
     --foreground: 217 33% 15%;
 
-    --muted: 210 50% 90%;
-    --muted-foreground: 210 50% 40%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
     --popover: 210 100% 95%;
     --popover-foreground: 210 100% 20%;
@@ -49,8 +49,8 @@ body {
     --background: 210 100% 20%;
     --foreground: 210 100% 95%;
 
-    --muted: 210 50% 30%;
-    --muted-foreground: 210 50% 70%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
 
     --popover: 210 100% 20%;
     --popover-foreground: 210 100% 95%;
