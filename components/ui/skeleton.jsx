@@ -13,7 +13,7 @@ const Skeleton = ({ className, ...props }) => {
   return (
     <div
       className={cn(
-        'animate-shimmer relative isolate overflow-hidden rounded-md bg-muted before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:border-t before:border-muted/20 before:bg-gradient-to-r before:from-transparent before:via-muted-foreground/10 before:to-transparent',
+        'relative isolate overflow-hidden rounded-md bg-muted before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:border-t before:border-muted/20 before:bg-gradient-to-r before:from-transparent before:via-muted-foreground/10 before:to-transparent',
         className
       )}
       {...props}
