@@ -332,7 +332,13 @@ export default function ChatInputForm({ chatId }) {
         {imagePreview && (
           <div className="relative mb-2">
             <div className="relative inline-block">
-              <img src={imagePreview} alt="Preview" className="max-h-32 rounded-lg object-cover" />
+              <div className="mb-2 h-20 w-32 overflow-hidden rounded border border-gray-200 bg-white">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="h-full w-full cursor-zoom-in object-cover"
+                />
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
