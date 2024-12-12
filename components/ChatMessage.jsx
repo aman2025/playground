@@ -1,11 +1,27 @@
 // Component to display individual chat messages with avatars
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import ReactMarkdown from 'react-markdown'
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
+import mediumZoom from 'medium-zoom'
 
 export default function ChatMessage({ message, session }) {
-  // Add state for zoom
-  const [isZoomed, setIsZoomed] = useState(false)
+  const zoomRef = useRef(null)
+
+  useEffect(() => {
+    // Initialize medium-zoom
+    if (zoomRef.current) {
+      const zoom = mediumZoom(zoomRef.current, {
+        margin: 24,
+        background: 'rgba(0, 0, 0, 0.5)',
+        scrollOffset: 0,
+      })
+
+      // Cleanup on unmount
+      return () => {
+        zoom.detach()
+      }
+    }
+  }, [message.imageUrl])
 
   // Check if message was paused by looking for the [paused] marker
   const isPaused = message.content.endsWith('[paused]')
@@ -37,33 +53,14 @@ export default function ChatMessage({ message, session }) {
         }`}
       >
         {message.imageUrl && (
-          <>
-            {/* Clickable image container */}
-            <div
-              className="mb-2 h-20 w-32 cursor-zoom-in overflow-hidden rounded border border-gray-200 transition-all duration-300 ease-in-out hover:opacity-90"
-              onClick={() => setIsZoomed(true)}
-            >
-              <img
-                src={message.imageUrl}
-                alt="Uploaded content"
-                className="h-full w-full object-contain"
-              />
-            </div>
-
-            {/* Zoomed image overlay */}
-            {isZoomed && (
-              <div
-                className="animate-fade-in fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black bg-opacity-50 transition-all duration-300 ease-in-out"
-                onClick={() => setIsZoomed(false)}
-              >
-                <img
-                  src={message.imageUrl}
-                  alt="Uploaded content"
-                  className="animate-zoom-in max-h-[90vh] max-w-[90vw] scale-100 transform object-contain"
-                />
-              </div>
-            )}
-          </>
+          <div className="mb-2 h-20 w-32 overflow-hidden rounded border border-gray-200">
+            <img
+              ref={zoomRef}
+              src={message.imageUrl}
+              alt="Uploaded content"
+              className="h-full w-full cursor-zoom-in object-cover"
+            />
+          </div>
         )}
         <div className="prose prose-sm max-w-none">
           <ReactMarkdown>{displayContent}</ReactMarkdown>
