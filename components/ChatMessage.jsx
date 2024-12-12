@@ -8,7 +8,6 @@ export default function ChatMessage({ message, session }) {
   const zoomRef = useRef(null)
 
   useEffect(() => {
-    // Initialize medium-zoom
     if (zoomRef.current) {
       const zoom = mediumZoom(zoomRef.current, {
         margin: 24,
@@ -16,7 +15,13 @@ export default function ChatMessage({ message, session }) {
         scrollOffset: 0,
       })
 
-      // Cleanup on unmount
+      // Keep the original image visible
+      zoom.on('open', () => {
+        if (zoomRef.current) {
+          zoomRef.current.style.visibility = 'visible'
+        }
+      })
+
       return () => {
         zoom.detach()
       }
@@ -53,12 +58,12 @@ export default function ChatMessage({ message, session }) {
         }`}
       >
         {message.imageUrl && (
-          <div className="mb-2 h-20 w-32 overflow-hidden rounded border border-gray-200">
+          <div className="mb-2 h-20 w-32 overflow-hidden rounded border border-gray-200 bg-white">
             <img
               ref={zoomRef}
               src={message.imageUrl}
               alt="Uploaded content"
-              className="h-full w-full cursor-zoom-in object-cover"
+              className="h-full w-full cursor-zoom-in object-contain"
             />
           </div>
         )}
