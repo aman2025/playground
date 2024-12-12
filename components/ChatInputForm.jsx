@@ -6,6 +6,7 @@ import { useChatStore } from '../store/chatStore'
 import { ImageIcon, SendIcon, X, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import mediumZoom from 'medium-zoom'
 
 // ChatInputForm component handles message input and file attachment
 export default function ChatInputForm({ chatId }) {
@@ -16,6 +17,7 @@ export default function ChatInputForm({ chatId }) {
   const [isCancelling, setIsCancelling] = useState(false)
   const [imagePreview, setImagePreview] = useState(null)
   const textareaRef = useRef(null)
+  const previewZoomRef = useRef(null)
 
   // Add this helper function at the top of the component
   const fileToBase64 = (file) => {
@@ -313,6 +315,28 @@ export default function ChatInputForm({ chatId }) {
     }
   }, [imagePreview])
 
+  // Add useEffect for zoom functionality
+  useEffect(() => {
+    if (previewZoomRef.current) {
+      const zoom = mediumZoom(previewZoomRef.current, {
+        margin: 24,
+        background: 'rgba(0, 0, 0, 0.5)',
+        scrollOffset: 0,
+      })
+
+      // Keep the original image visible
+      zoom.on('open', () => {
+        if (previewZoomRef.current) {
+          previewZoomRef.current.style.visibility = 'visible'
+        }
+      })
+
+      return () => {
+        zoom.detach()
+      }
+    }
+  }, [imagePreview]) // Re-run when imagePreview changes
+
   return (
     <div className="flex justify-center p-3">
       <div
@@ -334,6 +358,7 @@ export default function ChatInputForm({ chatId }) {
             <div className="relative inline-block">
               <div className="mb-2 h-20 w-32 overflow-hidden rounded border border-gray-200 bg-white">
                 <img
+                  ref={previewZoomRef}
                   src={imagePreview}
                   alt="Preview"
                   className="h-full w-full cursor-zoom-in object-cover"
