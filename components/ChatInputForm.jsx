@@ -228,10 +228,15 @@ export default function ChatInputForm({ chatId }) {
   // Handle file selection
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
-    if (file) {
-      // Create preview URL for the image
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+
+    if (file && allowedTypes.includes(file.type)) {
       const previewUrl = URL.createObjectURL(file)
       setImagePreview(previewUrl)
+    } else if (file) {
+      // Optional: Add error handling for unsupported file types
+      alert('Please upload only JPEG, PNG, GIF, or WebP images')
+      e.target.value = '' // Reset the input
     }
   }
 
@@ -348,7 +353,7 @@ export default function ChatInputForm({ chatId }) {
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept="image/*"
+          accept="image/jpeg,image/png,image/gif,image/webp"
           className="hidden"
         />
 
