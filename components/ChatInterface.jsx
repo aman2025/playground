@@ -134,7 +134,11 @@ export default function ChatInterface({ session }) {
     <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
       <div className="h-full w-full pt-6" data-radix-scroll-area-viewport="">
         <div
-          className={`w-full  ${!currentChatId ? 'flex min-h-[100vh] items-center justify-center' : 'flex justify-center'}`}
+          className={`w-full ${
+            !currentChatId
+              ? 'flex min-h-[calc(100vh-200px)] items-center justify-center'
+              : 'flex justify-center'
+          }`}
         >
           <div className="flex w-full max-w-[818px]">
             {isLoading ? (
@@ -156,7 +160,7 @@ export default function ChatInterface({ session }) {
                 {/* Cards Grid */}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                   {/* Generate Form Card */}
-                  <div className="rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                  <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                     <div className="mb-4 flex items-start space-x-3">
                       <div className="text-gray-400">
                         <svg
@@ -176,13 +180,12 @@ export default function ChatInterface({ session }) {
                       <h3 className="font-medium">Generate a form</h3>
                     </div>
                     <p className="text-sm text-gray-600">
-                      Based on provided image - two input field and a button - labeled are "name"
-                      "password" - button text is "save"
+                      Based on provided image, there are two input field and a button
                     </p>
                   </div>
 
                   {/* How to Card */}
-                  <div className="rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                  <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                     <div className="mb-4 flex items-start space-x-3">
                       <div className="text-gray-400">
                         <svg
@@ -207,7 +210,7 @@ export default function ChatInterface({ session }) {
                   </div>
 
                   {/* Generate Idea Card */}
-                  <div className="rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                  <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                     <div className="mb-4 flex items-start space-x-3">
                       <div className="text-gray-400">
                         <svg
