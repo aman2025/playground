@@ -7,7 +7,7 @@ import { chatApi } from '../services/api'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import Loading from '@/components/Loading'
 import { useRef, useState, useEffect } from 'react'
-
+import Image from 'next/image'
 export default function ChatInterface({ session }) {
   const currentChatId = useChatStore((state) => state.currentChatId)
   const isSending = useChatStore((state) => state.isSending)
@@ -142,8 +142,93 @@ export default function ChatInterface({ session }) {
                 Error: {error?.message || 'Failed to load messages'}
               </div>
             ) : !currentChatId ? (
-              <div className="flex h-full items-center justify-center text-gray-400">
-                Select a chat or start a new conversation
+              <div className="mx-auto w-full max-w-4xl px-4">
+                {/* Playground Header */}
+                <div className="mb-12 text-center">
+                  <div className="mx-auto mb-2 h-16 w-16">
+                    <Image src="/images/logo.png" alt="Playground Logo" width={64} height={64} />
+                  </div>
+                  <h1 className="text-sm font-semibold">PLAYGROUND</h1>
+                </div>
+
+                {/* Cards Grid */}
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  {/* Generate Form Card */}
+                  <div className="rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                    <div className="mb-4 flex items-start space-x-3">
+                      <div className="text-gray-400">
+                        <svg
+                          className="h-6 w-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="font-medium">Generate a form</h3>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      Based on provided image - two input field and a button - labeled are "name"
+                      "password" - button text is "save"
+                    </p>
+                  </div>
+
+                  {/* How to Card */}
+                  <div className="rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                    <div className="mb-4 flex items-start space-x-3">
+                      <div className="text-gray-400">
+                        <svg
+                          className="h-6 w-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="font-medium">How to</h3>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      How do I write a request for a proposal?
+                    </p>
+                  </div>
+
+                  {/* Generate Idea Card */}
+                  <div className="rounded-lg bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+                    <div className="mb-4 flex items-start space-x-3">
+                      <div className="text-gray-400">
+                        <svg
+                          className="h-6 w-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="font-medium">Generate idea</h3>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      List ideas for a fun remote team building event
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : messages.length === 0 ? (
               <div className="flex h-full items-center justify-center text-gray-400">
