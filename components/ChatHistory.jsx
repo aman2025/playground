@@ -6,6 +6,7 @@ import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useState } from 'react'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 
 // Component to display chat history in sidebar
 export default function ChatHistory() {
@@ -15,7 +16,7 @@ export default function ChatHistory() {
   const queryClient = useQueryClient()
 
   // Fetch chats using React Query
-  const { data: chats = [] } = useQuery({
+  const { data: chats = [], isLoading } = useQuery({
     queryKey: ['chats'],
     queryFn: chatApi.getAllChats,
   })
@@ -66,37 +67,52 @@ export default function ChatHistory() {
     window.history.pushState({}, '', `/chat/${chatId}`)
   }
 
+  // Add ChatHistorySkeleton component
+  const ChatHistorySkeleton = () => (
+    <div className="flex flex-col space-y-2 px-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="flex items-center justify-between">
+          <Skeleton className="h-5 w-full rounded-md" />
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <ScrollArea className="chat-history flex-1 px-3" type="always">
       <div className="flex flex-col">
         <div>
-          {chats.map((chat) => (
-            <div
-              key={chat.id}
-              onClick={() => handleChatClick(chat.id)}
-              className={`group mb-1 block flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-left ${
-                currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
-              }`}
-            >
-              <span className="block flex-grow truncate text-sm">{chat.title}</span>
-              <ConfirmDialog
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
-                title="Delete Chat"
-                description="Are you sure you want to delete this chat? This action cannot be undone."
-                onConfirm={handleConfirmDelete}
-                confirmText="Delete"
-                confirmVariant="destructive"
+          {isLoading ? (
+            <ChatHistorySkeleton />
+          ) : (
+            chats.map((chat) => (
+              <div
+                key={chat.id}
+                onClick={() => handleChatClick(chat.id)}
+                className={`group mb-1 block flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-left ${
+                  currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
+                }`}
               >
-                <button
-                  onClick={(e) => handleDelete(e, chat.id)}
-                  className="ml-2 hidden rounded p-0 group-hover:block"
+                <span className="block flex-grow truncate text-sm">{chat.title}</span>
+                <ConfirmDialog
+                  open={deleteDialogOpen}
+                  onOpenChange={setDeleteDialogOpen}
+                  title="Delete Chat"
+                  description="Are you sure you want to delete this chat? This action cannot be undone."
+                  onConfirm={handleConfirmDelete}
+                  confirmText="Delete"
+                  confirmVariant="destructive"
                 >
-                  <Trash2 className="h-3.5 w-3.5 text-gray-500 hover:text-blue-600" />
-                </button>
-              </ConfirmDialog>
-            </div>
-          ))}
+                  <button
+                    onClick={(e) => handleDelete(e, chat.id)}
+                    className="ml-2 hidden rounded p-0 group-hover:block"
+                  >
+                    <Trash2 className="h-3.5 w-3.5 text-gray-500 hover:text-blue-600" />
+                  </button>
+                </ConfirmDialog>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </ScrollArea>
