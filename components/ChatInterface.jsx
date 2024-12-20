@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import Loading from '@/components/Loading'
 import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
-import { FileText, HelpCircle, Lightbulb } from 'lucide-react'
+import WelcomeCards from './WelcomeCards'
 
 export default function ChatInterface({ session }) {
   const currentChatId = useChatStore((state) => state.currentChatId)
@@ -159,47 +159,7 @@ export default function ChatInterface({ session }) {
                   <h1 className="text-sm font-semibold">PLAYGROUND</h1>
                 </div>
 
-                {/* Cards Grid */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                  {/* Generate Form Card */}
-                  <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-                    <div className="mb-4 flex items-start items-center space-x-3">
-                      <div className="text-gray-400">
-                        <FileText className="h-5 w-5" />
-                      </div>
-                      <h3 className="font-medium">Generate a form</h3>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Based on provided image, there are two input field and a button
-                    </p>
-                  </div>
-
-                  {/* How to Card */}
-                  <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-                    <div className="mb-4 flex items-start items-center space-x-3">
-                      <div className="text-gray-400">
-                        <HelpCircle className="h-5 w-5" />
-                      </div>
-                      <h3 className="font-medium">How to</h3>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      How do I write a request for a proposal?
-                    </p>
-                  </div>
-
-                  {/* Generate Idea Card */}
-                  <div className="rounded-lg border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-                    <div className="mb-4 flex items-start items-center space-x-3">
-                      <div className="text-gray-400">
-                        <Lightbulb className="h-5 w-5" />
-                      </div>
-                      <h3 className="font-medium">Generate idea</h3>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      List ideas for a fun remote team building event
-                    </p>
-                  </div>
-                </div>
+                <WelcomeCards />
               </div>
             ) : messages.length === 0 ? (
               <div className="flex h-full items-center justify-center text-gray-400">
