@@ -9,11 +9,16 @@ import Loading from '@/components/Loading'
 import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import WelcomeCards from './WelcomeCards'
+import { usePathname } from 'next/navigation'
 
 export default function ChatInterface({ session }) {
   const currentChatId = useChatStore((state) => state.currentChatId)
   const isSending = useChatStore((state) => state.isSending)
   const { setContextWindow } = useChatStore.getState()
+
+  // Add pathname to detect if we're on a specific chat route
+  const pathname = usePathname()
+  const isSpecificChatRoute = pathname.startsWith('/chat/')
 
   // Add a ref to track if we should update context
   const shouldUpdateContext = useRef(true)
@@ -137,19 +142,19 @@ export default function ChatInterface({ session }) {
       <div className="h-full w-full pt-6" data-radix-scroll-area-viewport="">
         <div
           className={`w-full ${
-            !currentChatId
+            !currentChatId && !isSpecificChatRoute
               ? 'flex min-h-[calc(100vh-200px)] items-center justify-center'
               : 'flex justify-center'
           }`}
         >
           <div className="flex w-full max-w-[818px]">
-            {isLoading ? (
+            {isLoading || (isSpecificChatRoute && !currentChatId) ? (
               <MessageSkeleton />
             ) : isError ? (
               <div className="flex h-full items-center justify-center text-red-500">
                 Error: {error?.message || 'Failed to load messages'}
               </div>
-            ) : !currentChatId ? (
+            ) : !currentChatId && !isSpecificChatRoute ? (
               <div className="mx-auto w-full max-w-4xl px-4">
                 {/* Playground Header */}
                 <div className="mb-12 text-center">
