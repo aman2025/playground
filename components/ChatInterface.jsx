@@ -137,6 +137,27 @@ export default function ChatInterface({ session }) {
     </div>
   )
 
+  // Add delayed loading state and initial load flag
+  const [showSkeleton, setShowSkeleton] = useState(true) // Initialize as true
+  const isInitialLoad = useRef(true)
+
+  // Update skeleton display with delay only for non-initial loads
+  useEffect(() => {
+    if (isLoading || (isSpecificChatRoute && !currentChatId)) {
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false
+        setShowSkeleton(true)
+      } else {
+        const timer = setTimeout(() => {
+          setShowSkeleton(true)
+        }, 500)
+        return () => clearTimeout(timer)
+      }
+    } else {
+      setShowSkeleton(false)
+    }
+  }, [isLoading, isSpecificChatRoute, currentChatId])
+
   return (
     <ScrollArea ref={scrollAreaRef} className="flex flex-1" type="always">
       <div className="h-full w-full pt-6" data-radix-scroll-area-viewport="">
@@ -149,7 +170,9 @@ export default function ChatInterface({ session }) {
         >
           <div className="flex w-full max-w-[818px]">
             {isLoading || (isSpecificChatRoute && !currentChatId) ? (
-              <MessageSkeleton />
+              showSkeleton ? (
+                <MessageSkeleton />
+              ) : null
             ) : isError ? (
               <div className="flex h-full items-center justify-center text-red-500">
                 Error: {error?.message || 'Failed to load messages'}
