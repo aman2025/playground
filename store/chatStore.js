@@ -18,8 +18,12 @@ export const useChatStore = create((set) => ({
     set({ contextWindow: lastTwoMessages })
   },
   // trigger submit message at the welcome cards component
-  submitMessage: (message) => {
+  submitMessage: (message, formData = null) => {
     set({ pendingMessage: message })
+    if (formData) {
+      // Store the FormData for use in ChatInputForm
+      set({ pendingFormData: formData })
+    }
   },
 
   pendingMessage: null,

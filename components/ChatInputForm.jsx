@@ -13,7 +13,9 @@ export default function ChatInputForm({ chatId }) {
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
-  const { setCurrentChatId, setIsSending, scrollToBottom, pendingMessage } = useChatStore()
+  const { setCurrentChatId, setIsSending, scrollToBottom, pendingMessage, pendingFormData } =
+    useChatStore()
+
   const [isCancelling, setIsCancelling] = useState(false)
   const [imagePreview, setImagePreview] = useState(null)
   const textareaRef = useRef(null)
@@ -154,18 +156,23 @@ export default function ChatInputForm({ chatId }) {
     const content = pendingMessage || input
     if (!content.trim()) return
 
-    const formData = new FormData()
+    // Use pending FormData if available, otherwise create new FormData
+    const formData = pendingFormData || new FormData()
 
-    // Combine context window with current content
-    const contextWindow = useChatStore.getState().contextWindow
-    const contextPrompt = contextWindow.map((msg) => `${msg.role}: ${msg.content}`).join('\n')
-    const fullPrompt = contextWindow.length
-      ? `Previous context:\n${contextPrompt}\n\nUser: ${content}`
-      : content
+    // Only append content if it's not already in pendingFormData
+    if (!pendingFormData) {
+      const contextWindow = useChatStore.getState().contextWindow
+      const contextPrompt = contextWindow.map((msg) => `${msg.role}: ${msg.content}`).join('\n')
+      const fullPrompt = contextWindow.length
+        ? `Previous context:\n${contextPrompt}\n\nUser: ${content}`
+        : content
 
-    formData.append('content', fullPrompt)
-    if (fileInputRef.current?.files?.[0]) {
-      formData.append('image', fileInputRef.current.files[0])
+      formData.append('content', fullPrompt)
+
+      // Only append file if there's no pending FormData
+      if (fileInputRef.current?.files?.[0]) {
+        formData.append('image', fileInputRef.current.files[0])
+      }
     }
 
     try {
@@ -201,6 +208,9 @@ export default function ChatInputForm({ chatId }) {
     } catch (error) {
       console.error('Error:', error)
     }
+
+    // Clear pending FormData after submission
+    useChatStore.setState({ pendingFormData: null })
   }
 
   // Update the cancel handler

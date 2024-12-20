@@ -1,12 +1,13 @@
 import { FileText, HelpCircle, Lightbulb } from 'lucide-react'
 import { useChatStore } from '../store/chatStore'
 
-// Card data for easy maintenance and updates
+// Updated card data with image path for the form generation card
 const cards = [
   {
     icon: FileText,
     title: 'Generate a form',
     description: 'Based on provided image, there are two input field and a button',
+    imagePath: '/images/form.png',
   },
   {
     icon: HelpCircle,
@@ -39,15 +40,36 @@ const Card = ({ icon: Icon, title, description, onClick }) => (
 export default function WelcomeCards() {
   const { submitMessage } = useChatStore()
 
-  // Handle card click
-  const handleCardClick = (description) => {
-    submitMessage(description)
+  // Updated handleCardClick to handle image
+  const handleCardClick = async (card) => {
+    if (card.imagePath) {
+      // Create a FormData instance
+      const formData = new FormData()
+
+      // Fetch the image and convert it to a file
+      try {
+        const response = await fetch(card.imagePath)
+        const blob = await response.blob()
+        const file = new File([blob], 'captcha.png', { type: 'image/png' })
+
+        formData.append('image', file)
+        formData.append('content', card.description)
+
+        // Update the store with both message and FormData
+        submitMessage(card.description, formData)
+      } catch (error) {
+        console.error('Error loading image:', error)
+        submitMessage(card.description)
+      }
+    } else {
+      submitMessage(card.description)
+    }
   }
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
       {cards.map((card, index) => (
-        <Card key={index} {...card} onClick={() => handleCardClick(card.description)} />
+        <Card key={index} {...card} onClick={() => handleCardClick(card)} />
       ))}
     </div>
   )
