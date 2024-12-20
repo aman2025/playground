@@ -11,15 +11,16 @@ export const useChatStore = create((set) => ({
   // Add function to capture context before sending
   setContextWindow: (messages) => {
     if (!messages?.length) {
-      console.log('Context Window Captured: Empty (New Chat)')
       return set({ contextWindow: [] })
     }
 
     const lastTwoMessages = messages.slice(-2)
-    console.log('Context Window Captured:', {
-      totalMessages: messages.length,
-      contextWindow: lastTwoMessages,
-    })
     set({ contextWindow: lastTwoMessages })
   },
+  // trigger submit message at the welcome cards component
+  submitMessage: (message) => {
+    set({ pendingMessage: message })
+  },
+
+  pendingMessage: null,
 }))

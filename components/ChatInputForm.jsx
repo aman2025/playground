@@ -13,7 +13,7 @@ export default function ChatInputForm({ chatId }) {
   const [input, setInput] = useState('')
   const fileInputRef = useRef()
   const queryClient = useQueryClient()
-  const { setCurrentChatId, setIsSending, scrollToBottom } = useChatStore()
+  const { setCurrentChatId, setIsSending, scrollToBottom, pendingMessage } = useChatStore()
   const [isCancelling, setIsCancelling] = useState(false)
   const [imagePreview, setImagePreview] = useState(null)
   const textareaRef = useRef(null)
@@ -149,16 +149,19 @@ export default function ChatInputForm({ chatId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!input.trim()) return
+
+    // Get the content either from input state or pending message
+    const content = pendingMessage || input
+    if (!content.trim()) return
 
     const formData = new FormData()
 
-    // Combine context window with current input
+    // Combine context window with current content
     const contextWindow = useChatStore.getState().contextWindow
     const contextPrompt = contextWindow.map((msg) => `${msg.role}: ${msg.content}`).join('\n')
     const fullPrompt = contextWindow.length
-      ? `Previous context:\n${contextPrompt}\n\nUser: ${input}`
-      : input
+      ? `Previous context:\n${contextPrompt}\n\nUser: ${content}`
+      : content
 
     formData.append('content', fullPrompt)
     if (fileInputRef.current?.files?.[0]) {
@@ -166,8 +169,10 @@ export default function ChatInputForm({ chatId }) {
     }
 
     try {
-      const currentInput = input
       setInput('')
+      // Clear pending message after getting content
+      useChatStore.setState({ pendingMessage: null })
+
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
@@ -178,7 +183,7 @@ export default function ChatInputForm({ chatId }) {
         useChatStore.setState({ contextWindow: [] })
 
         try {
-          const newChat = await createChatMutation.mutateAsync(currentInput.trim())
+          const newChat = await createChatMutation.mutateAsync(content.trim())
           await queryClient.invalidateQueries({ queryKey: ['chats'] })
 
           await sendMessageMutation.mutateAsync({
@@ -341,6 +346,13 @@ export default function ChatInputForm({ chatId }) {
       }
     }
   }, [imagePreview]) // Re-run when imagePreview changes
+
+  // Simplify the useEffect to just trigger submit
+  useEffect(() => {
+    if (pendingMessage) {
+      handleSubmit({ preventDefault: () => {} })
+    }
+  }, [pendingMessage])
 
   return (
     <div className="flex justify-center p-3">
