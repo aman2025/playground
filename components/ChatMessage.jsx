@@ -4,12 +4,16 @@ import ReactMarkdown from 'react-markdown'
 import { useEffect, useRef, useState } from 'react'
 import mediumZoom from 'medium-zoom'
 import { Copy, CheckCheck } from 'lucide-react'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism' // You can choose different themes
 
-// Custom renderer for code blocks
+// Enhanced CodeBlock component with syntax highlighting
 const CodeBlock = ({ children, className }) => {
   const [copied, setCopied] = useState(false)
 
-  // Handle copy function
+  // Extract language from className (format: language-javascript)
+  const language = className ? className.replace('language-', '') : 'text'
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(children)
     setCopied(true)
@@ -20,13 +24,36 @@ const CodeBlock = ({ children, className }) => {
     <div className="group relative">
       <button
         onClick={handleCopy}
-        className="absolute right-[1px] top-[-15px] rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+        className="absolute right-2 top-2 z-10 rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
       >
         {copied ? <CheckCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       </button>
-      <pre className={className}>
-        <code>{children}</code>
-      </pre>
+      <SyntaxHighlighter
+        language={language}
+        style={{
+          ...oneDark,
+          'pre[class*="language-"]': {
+            ...oneDark['pre[class*="language-"]'],
+            background: '#1e1e1e',
+            margin: 0,
+            fontSize: '1em',
+          },
+          'code[class*="language-"]': {
+            ...oneDark['code[class*="language-"]'],
+            background: 'none',
+            fontSize: '1em',
+          },
+        }}
+        customStyle={{
+          margin: 0,
+          borderRadius: '0.375rem',
+          fontSize: '1em',
+        }}
+        showLineNumbers={false}
+        wrapLines={true}
+      >
+        {children}
+      </SyntaxHighlighter>
     </div>
   )
 }
@@ -99,7 +126,17 @@ export default function ChatMessage({ message, session }) {
         <div className="prose prose-sm max-w-none">
           <ReactMarkdown
             components={{
-              code: CodeBlock,
+              code: ({ node, inline, className, children, ...props }) => {
+                // Handle inline code differently
+                if (inline) {
+                  return (
+                    <code className="rounded bg-gray-200 px-1 py-0.5 text-sm" {...props}>
+                      {children}
+                    </code>
+                  )
+                }
+                return <CodeBlock className={className}>{children}</CodeBlock>
+              },
             }}
           >
             {displayContent}
