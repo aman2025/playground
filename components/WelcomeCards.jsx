@@ -6,7 +6,7 @@ const cards = [
   {
     icon: FileText,
     title: 'Generate a form',
-    description: 'Based on provided image, there are two input field and a button',
+    description: 'Based on provided image, create html form',
     imagePath: '/images/form.png',
   },
   {

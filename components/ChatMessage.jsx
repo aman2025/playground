@@ -1,8 +1,35 @@
 // Component to display individual chat messages with avatars
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import ReactMarkdown from 'react-markdown'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import mediumZoom from 'medium-zoom'
+import { Copy, CheckCheck } from 'lucide-react'
+
+// Custom renderer for code blocks
+const CodeBlock = ({ children, className }) => {
+  const [copied, setCopied] = useState(false)
+
+  // Handle copy function
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(children)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="group relative">
+      <button
+        onClick={handleCopy}
+        className="absolute right-[1px] top-[-15px] rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+      >
+        {copied ? <CheckCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      </button>
+      <pre className={className}>
+        <code>{children}</code>
+      </pre>
+    </div>
+  )
+}
 
 export default function ChatMessage({ message, session }) {
   const zoomRef = useRef(null)
@@ -70,7 +97,13 @@ export default function ChatMessage({ message, session }) {
           </div>
         )}
         <div className="prose prose-sm max-w-none">
-          <ReactMarkdown>{displayContent}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              code: CodeBlock,
+            }}
+          >
+            {displayContent}
+          </ReactMarkdown>
         </div>
         {/* Timestamp positioned absolutely with conditional alignment */}
         <div
