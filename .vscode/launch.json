@@ -4,24 +4,19 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Vue Development",
-      "runtimeVersion": "16.19.0",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "env": {
-        "PATH": "${env:HOME}/.nvm/versions/node/v16.19.0/bin:${env:PATH}",
-        "NODE_VERSION": "16.19.0",
-        "NODE_OPTIONS": "--max-old-space-size=4096"
-      },
-      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "name": "Debug Next.js",
+      "runtimeExecutable": "${env:HOME}/.nvm/versions/node/v20.16.0/bin/node",
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "args": ["dev"],
       "console": "integratedTerminal",
-      "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
-      "timeout": 20000,
-      "autoAttachChildProcesses": false,
-      "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///src/*": "${workspaceFolder}/src/*"
-      }
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Debug in Chrome",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
     }
   ]
 }
