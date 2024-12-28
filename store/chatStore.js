@@ -14,7 +14,7 @@ export const useChatStore = create((set) => ({
       return set({ contextWindow: [] })
     }
 
-    const lastTwoMessages = messages.slice(-2)
+    const lastTwoMessages = []
     set({ contextWindow: lastTwoMessages })
   },
   // trigger submit message at the welcome cards component
