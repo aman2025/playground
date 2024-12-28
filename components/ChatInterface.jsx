@@ -5,7 +5,6 @@ import ChatMessage from './ChatMessage'
 import { useChatStore } from '../store/chatStore'
 import { chatApi } from '../services/api'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import Loading from '@/components/Loading'
 import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import WelcomeCards from './WelcomeCards'
@@ -196,9 +195,22 @@ export default function ChatInterface({ session }) {
             ) : (
               <div className="w-full">
                 {messages.map((message) => (
-                  <ChatMessage key={message.id} message={message} session={session} />
+                  <ChatMessage
+                    key={message.id}
+                    message={message}
+                    session={session}
+                    isLoading={isSending && message === messages[messages.length - 1]}
+                  />
                 ))}
-                {isSending && <Loading className="mt-4" />}
+                {isSending && messages[messages.length - 1]?.role === 'user' && (
+                  <div className="[&>div:nth-child(1)>div:nth-child(2)]:pt-1">
+                    <ChatMessage
+                      message={{ role: 'assistant', content: '' }}
+                      session={session}
+                      isLoading={true}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>

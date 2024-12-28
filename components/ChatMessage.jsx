@@ -6,6 +6,7 @@ import mediumZoom from 'medium-zoom'
 import { Copy, CheckCheck } from 'lucide-react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism' // You can choose different themes
+import Loading from '@/components/Loading'
 
 // Enhanced CodeBlock component with syntax highlighting
 const CodeBlock = ({ children, className }) => {
@@ -58,7 +59,7 @@ const CodeBlock = ({ children, className }) => {
   )
 }
 
-export default function ChatMessage({ message, session }) {
+export default function ChatMessage({ message, session, isLoading }) {
   const zoomRef = useRef(null)
 
   useEffect(() => {
@@ -142,6 +143,10 @@ export default function ChatMessage({ message, session }) {
             {displayContent}
           </ReactMarkdown>
         </div>
+
+        {/* Add Loading component when assistant is responding */}
+        {message.role === 'assistant' && isLoading && <Loading className="mt-2" />}
+
         {/* Timestamp positioned absolutely with conditional alignment */}
         <div
           className={`absolute bottom-0 translate-y-full pt-1 text-xs text-gray-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${

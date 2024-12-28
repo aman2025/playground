@@ -408,12 +408,17 @@ export default function ChatInputForm({ chatId }) {
           ref={textareaRef}
           rows={1}
           placeholder="Type a message..."
-          className="w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-sm focus:outline-none focus:ring-0"
+          className={`w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-sm focus:outline-none focus:ring-0 ${
+            createChatMutation.isPending || sendMessageMutation.isPending
+              ? 'cursor-not-allowed opacity-50'
+              : ''
+          }`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           onPaste={handlePaste}
           style={{ maxHeight: '9rem' }}
+          disabled={createChatMutation.isPending || sendMessageMutation.isPending}
         />
 
         {/* Bottom controls area */}
@@ -425,8 +430,9 @@ export default function ChatInputForm({ chatId }) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-[10px] text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                  className="h-8 w-8 rounded-[10px] text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={() => fileInputRef.current?.click()}
+                  disabled={createChatMutation.isPending || sendMessageMutation.isPending}
                 >
                   <ImageIcon className="h-4 w-4" />
                 </Button>
