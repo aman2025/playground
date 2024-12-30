@@ -8,6 +8,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism' // You can choose different themes
 import Loading from '@/components/Loading'
 import { useChatStore } from '@/store/chatStore'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // Enhanced CodeBlock component with syntax highlighting
 const CodeBlock = ({ children, className }) => {
@@ -31,18 +32,30 @@ const CodeBlock = ({ children, className }) => {
   return (
     <div className="group relative">
       <div className="absolute right-2 top-2 z-10 flex gap-2">
-        <button
-          onClick={handleViewerClick}
-          className="rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
-        >
-          <Maximize2 className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleCopy}
-          className="rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
-        >
-          {copied ? <CheckCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleViewerClick}
+                className="rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">preview</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleCopy}
+                className="rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+              >
+                {copied ? <CheckCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">copy</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <SyntaxHighlighter
         language={language}
