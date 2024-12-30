@@ -109,9 +109,7 @@ export default function ChatMessage({ message, session, isLoading }) {
       {/* Message content */}
       <div
         className={`group relative rounded-[20px] ${
-          message.role === 'user'
-            ? 'max-w-[80%] bg-gray-100 px-4 py-2'
-            : `max-w-[91%] bg-white px-2`
+          message.role === 'user' ? 'max-w-[80%] bg-gray-100 px-4 py-2' : `w-[91%] bg-white px-2`
         }`}
       >
         {message.imageUrl && (
