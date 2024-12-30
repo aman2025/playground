@@ -2,6 +2,7 @@
 import { useChatStore } from '@/store/chatStore'
 import { Minimize2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Sandpack from './Sandpack'
 
 export default function CodeViewer() {
   const { codeViewerContent, isCodeViewerOpen, setIsCodeViewerOpen } = useChatStore()
@@ -27,7 +28,9 @@ export default function CodeViewer() {
             >
               <Minimize2 className="h-6 w-6" />
             </button>
-            <div className="h-full overflow-auto rounded-lg bg-white p-6">{codeViewerContent}</div>
+            <div className="h-full overflow-auto rounded-lg bg-white p-6">
+              <Sandpack content={codeViewerContent} />
+            </div>
           </motion.div>
         </motion.div>
       )}
