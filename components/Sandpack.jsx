@@ -35,6 +35,7 @@ new Vue({
       files={files}
       options={{
         showNavigator: true,
+        editorHeight: '86vh',
         showTabs: true,
       }}
       customSetup={{
