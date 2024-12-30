@@ -1,5 +1,6 @@
 import Providers from './providers'
 import './globals.css'
+import CodeViewer from '@/components/CodeViewer'
 
 export const metadata = {
   title: 'dw-playground',
@@ -10,7 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <CodeViewer />
+        </Providers>
       </body>
     </html>
   )

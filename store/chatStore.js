@@ -27,4 +27,10 @@ export const useChatStore = create((set) => ({
   },
 
   pendingMessage: null,
+
+  // Add new state for code viewer
+  codeViewerContent: null,
+  setCodeViewerContent: (content) => set({ codeViewerContent: content }),
+  isCodeViewerOpen: false,
+  setIsCodeViewerOpen: (isOpen) => set({ isCodeViewerOpen: isOpen }),
 }))

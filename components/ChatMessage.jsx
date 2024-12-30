@@ -3,14 +3,16 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import ReactMarkdown from 'react-markdown'
 import { useEffect, useRef, useState } from 'react'
 import mediumZoom from 'medium-zoom'
-import { Copy, CheckCheck } from 'lucide-react'
+import { Copy, CheckCheck, Maximize2 } from 'lucide-react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism' // You can choose different themes
 import Loading from '@/components/Loading'
+import { useChatStore } from '@/store/chatStore'
 
 // Enhanced CodeBlock component with syntax highlighting
 const CodeBlock = ({ children, className }) => {
   const [copied, setCopied] = useState(false)
+  const { setCodeViewerContent, setIsCodeViewerOpen } = useChatStore()
 
   // Extract language from className (format: language-javascript)
   const language = className ? className.replace('language-', '') : 'text'
@@ -21,14 +23,27 @@ const CodeBlock = ({ children, className }) => {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleViewerClick = () => {
+    setCodeViewerContent(children)
+    setIsCodeViewerOpen(true)
+  }
+
   return (
     <div className="group relative">
-      <button
-        onClick={handleCopy}
-        className="absolute right-2 top-2 z-10 rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
-      >
-        {copied ? <CheckCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      </button>
+      <div className="absolute right-2 top-2 z-10 flex gap-2">
+        <button
+          onClick={handleViewerClick}
+          className="rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+        >
+          <Maximize2 className="h-4 w-4" />
+        </button>
+        <button
+          onClick={handleCopy}
+          className="rounded bg-gray-800 p-1 text-gray-300 opacity-0 transition-opacity group-hover:opacity-100"
+        >
+          {copied ? <CheckCheck className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+        </button>
+      </div>
       <SyntaxHighlighter
         language={language}
         style={{
