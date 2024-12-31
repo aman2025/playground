@@ -1,17 +1,34 @@
 # DW-Playground Changelog
 
-## [1.0.0]
+## [1.0.0] - 2024-12-31
 
-- add system prompt to generate specific code (temporally use Element-UI)
-- add Sandpack to preview and edit code
-- add login and register
-- add email verification
-- add email sending
-- add uploading image
-- add markdown preview
-- add code highlight
-- add image zoom
-- add animation
-- add chat history
+### Added
 
-- Initial release from 1.0.0
+- AI Code Generation System with Element-UI(temporally) integration
+- Interactive code preview and editing with Sandpack
+- User Authentication
+  - Login and registration system
+  - Email verification
+- File Management
+  - Image upload functionality
+  - Markdown preview support
+- Enhanced UI/UX
+  - Code syntax highlighting
+  - Image zoom capability
+  - Smooth animations
+- Chat history management
+
+### Initial Features
+
+- Mistral AI integration for code generation
+- Vue page generation from prompts/images/sketches
+- Real-time code sandbox environment
+- Full tech stack implementation:
+  - Next.js with app router
+  - Tailwind CSS
+  - Shadcn/UI
+  - Zustand state management
+  - PostgreSQL database
+  - Prisma ORM
+  - Authentication via NextAuth
+  - Email services via Nodemailer
