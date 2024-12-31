@@ -37,9 +37,15 @@ export default function SignIn() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-        <h1 className="text-center text-2xl font-bold">Sign In</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="min-h-[600px] w-full max-w-md space-y-4 rounded-[15px] border border-gray-200 bg-white p-16"
+      >
+        <div className="flex flex-col items-center justify-center pb-8 pt-5">
+          <img src="/images/logo.png" alt="Logo" className="h-20 w-20" />
+          <h5 className="pt-3 text-center">Sign In</h5>
+        </div>
         <Input
           type="email"
           placeholder="Email"
@@ -58,7 +64,7 @@ export default function SignIn() {
           Sign In
         </Button>
         {error && <p className="text-center text-red-500">{error}</p>} {/* Display error message */}
-        <div className="space-y-2 text-center">
+        <div className="space-y-3 text-center">
           <div>
             <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
               Forgot Password?
