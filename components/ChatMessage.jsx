@@ -150,7 +150,7 @@ export default function ChatMessage({ message, session, isLoading }) {
             />
           </div>
         )}
-        <div className="prose prose-sm max-w-none  [&>pre]:px-0 [&>pre]:pt-0">
+        <div className="prose prose-sm max-w-none [&>pre]:rounded-lg [&>pre]:px-0 [&>pre]:pt-0">
           <ReactMarkdown
             components={{
               code: ({ node, inline, className, children, ...props }) => {

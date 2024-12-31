@@ -115,12 +115,12 @@ export default function ChatHistory() {
 
     return (
       <div className="mb-4">
-        <h3 className="px-2 text-xs text-gray-400">{title}</h3>
+        <h3 className="px-2 pb-1 text-xs text-gray-400">{title}</h3>
         {chats.map((chat) => (
           <div
             key={chat.id}
             onClick={() => handleChatClick(chat.id)}
-            className={`group mb-1 block flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-left ${
+            className={`group mb-1 block flex w-full cursor-pointer items-center justify-between rounded-lg px-2 py-1 text-left ${
               currentChatId === chat.id ? 'bg-gray-200' : 'hover:bg-gray-100'
             }`}
           >
