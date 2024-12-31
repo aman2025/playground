@@ -1,7 +1,7 @@
-<a href="#">
-  <img alt="Gemini Coder" src="./public/images/logo.png">
-  <h1 align="center">DW-Playground</h1>
-</a>
+<p align="center">
+  <img alt="Gemini Coder" width="100" height="100" src="./public/images/logo.png">
+  <h3 align="center">DW-Playground</h3>
+</p>
 
 <p align="center">
   Generate a Vue page with a prompt or design image or sketch. Powered by open source models from Mistral AI.
