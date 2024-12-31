@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -57,6 +58,13 @@ export default function ForgotPassword() {
           Reset Password
         </Button>
         {message && <p className="mt-4 text-center">{message}</p>}
+        <div className="space-y-3 text-center">
+          <div>
+            <Link href="/signin" className="text-sm text-blue-600 hover:underline">
+              Back to Sign In
+            </Link>
+          </div>
+        </div>
       </form>
     </div>
   )
