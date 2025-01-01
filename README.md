@@ -29,3 +29,7 @@
 
 1. Create a `.env` file and add your [Mistral AI API key](https://mistral.ai/api/docs): `MISTRAL_API_KEY=`、 `MISTRAL_API_ENDPOINT=` or `AGENT_ID`
 2. Run `npm install` and `npm run dev` to install dependencies and run locally
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
