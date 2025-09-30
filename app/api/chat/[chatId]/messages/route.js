@@ -143,9 +143,10 @@ export async function POST(request, { params }) {
       new ReadableStream({
         async start(streamController) {
           const reader = mistralResponse.body.getReader()
-          const decoder = new TextDecoder()
+          const decoder = new TextDecoder('utf-8')
           let accumulatedContent = ''
           let isStreamClosed = false
+          let buffer = '' // Buffer for incomplete chunks
 
           const cleanup = async () => {
             try {
@@ -208,24 +209,30 @@ export async function POST(request, { params }) {
                   break
                 }
 
-                const chunk = decoder.decode(value)
-                const lines = chunk.split('\n').filter((line) => line.trim())
+                const chunk = decoder.decode(value, { stream: true })
+                buffer += chunk
+
+                // Process complete lines
+                const lines = buffer.split('\n')
+                buffer = lines.pop() || '' // Keep the last incomplete line in buffer
 
                 for (const line of lines) {
-                  if (line.startsWith('data: ')) {
-                    const jsonString = line.slice(6)
-                    if (jsonString === '[DONE]') continue
+                  const trimmedLine = line.trim()
+                  if (trimmedLine.startsWith('data: ')) {
+                    const jsonString = trimmedLine.slice(6).trim()
+                    if (jsonString === '[DONE]' || !jsonString) continue
 
                     try {
                       const jsonData = JSON.parse(jsonString)
-                      const content = jsonData.choices[0]?.delta?.content || ''
+                      const content = jsonData.choices?.[0]?.delta?.content || ''
                       if (content) {
                         accumulatedContent += content
                         const sseMessage = `data: ${JSON.stringify({ content })}\n\n`
                         streamController.enqueue(new TextEncoder().encode(sseMessage))
                       }
                     } catch (e) {
-                      console.error('Error parsing JSON:', e)
+                      // Skip malformed JSON chunks - they're likely incomplete
+                      console.warn('Skipping malformed JSON chunk:', jsonString.substring(0, 100))
                     }
                   }
                 }
@@ -253,16 +260,6 @@ export async function POST(request, { params }) {
         },
       }
     )
-
-    // Update chat title if it's the first message
-    if (chatHistory.length === 0) {
-      await prisma.chat.update({
-        where: { id: params.chatId },
-        data: { title: content.substring(0, 30) + '...' },
-      })
-    }
-
-    return NextResponse.json([assistantMessage])
   } catch (error) {
     console.error('Error in messages route:', error)
     streamControllers.delete(params.chatId)

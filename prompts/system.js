@@ -12,7 +12,7 @@ You are an expert frontend Vue 2 engineer who is also a great UI generator using
 	  <el-form-item label="name">
 			<el-input v-model="form.name" />
 		</el-form-item>
-	  <el-form-item lable="password">
+	  <el-form-item label="password">
 	      <el-input name='password' v-model='password' placeholder='please input password' />
 	  </el-form-item>
   </el-form>

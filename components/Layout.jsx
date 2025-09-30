@@ -7,6 +7,7 @@ import ChatHistory from '@/components/ChatHistory'
 import UserProfile from '@/components/UserProfile'
 import ChatInputForm from '@/components/ChatInputForm'
 import ChatInterface from '@/components/ChatInterface'
+import CodeViewer from '@/components/CodeViewer'
 import { useRouter } from 'next/navigation'
 import { Plus } from 'lucide-react'
 
@@ -71,6 +72,9 @@ export default function Layout({ session }) {
           <ChatInputForm chatId={currentChatId} />
         </div>
       </main>
+      
+      {/* Code Viewer Modal */}
+      <CodeViewer />
     </div>
   )
 }
